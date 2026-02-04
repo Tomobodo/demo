@@ -1,41 +1,52 @@
 ﻿#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-//#include <intrin.h>
+#include <dwmapi.h>
 
-constexpr int WIDTH = 640;
-constexpr int HEIGHT = 480;
+#include "scene.hpp"
+#include "scene_a.hpp"
+#include "frame_infos.h"
 
-constexpr int PIXEL_SIZE = 1;
-constexpr int BUFFER_WIDTH = WIDTH / PIXEL_SIZE, BUFFER_HEIGHT = HEIGHT / PIXEL_SIZE;
+constexpr int BUFFER_WIDTH = 850;
+constexpr int BUFFER_HEIGHT = 480;
 
-constexpr int BALL_RADIUS = 20;
+//constexpr int BUFFER_WIDTH = 1920;
+//constexpr int BUFFER_HEIGHT = 1080;
 
 unsigned int pixel_buffer[BUFFER_WIDTH * BUFFER_HEIGHT];
 
-int freq = 440;
+#ifdef DEBUG
+extern "C" int _fltused = 0;
+#endif
 
-//float sqrt(float x)
-//{
-//	float res;
-//	__m128 in = _mm_set_ss(x);
-//	__m128 out = _mm_sqrt_ss(in);
-//	_mm_store_ss(&res, out);
-//	return res;
-//}
+void* operator new(size_t size)
+{
+	return HeapAlloc(GetProcessHeap(), 0, size);
+}
 
-//DWORD WINAPI PlayBeep(LPVOID lpParam)
-//{
-//	Beep(++freq,50);
-//	return 0;
-//}
+void operator delete(void* p, size_t size) noexcept
+{
+	if (p) HeapFree(GetProcessHeap(), 0, p);
+}
+
+extern "C" {
+#pragma function(memset)
+void* __cdecl memset(void* dest, int c, size_t count)
+{
+	auto p = static_cast<unsigned char*>(dest);
+	while (count--)
+		*p++ = static_cast<unsigned char>(c);
+	return dest;
+}
+}
+
 
 extern "C" void entry()
 {
-	HWND hWnd = CreateWindowEx(8,
-		"static", nullptr,
-		WS_POPUP | WS_VISIBLE | WS_MAXIMIZE,
-		0, 0, 0, 0,
-		0, 0, 0, 0
+	HWND hWnd = CreateWindowEx(0,
+	                           reinterpret_cast<LPCSTR>(0x8000), nullptr,
+	                           WS_POPUP | WS_VISIBLE | WS_MAXIMIZE,
+	                           0, 0, 0, 0,
+	                           nullptr, nullptr, nullptr, nullptr
 	);
 
 	HDC hdc = GetDC(hWnd);
@@ -48,75 +59,85 @@ extern "C" void entry()
 	bmi.bmiHeader.biPlanes = 1;
 	bmi.bmiHeader.biBitCount = 32;
 
-	int ball_pos_x = 0, ball_pos_y = 0, ball_vit_x = 2, ball_vit_y = 2;
+	LARGE_INTEGER freq, t_start, t_end;
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&t_start);
 
-	while (!GetAsyncKeyState(VK_ESCAPE))
+	auto frequency = static_cast<unsigned int>(freq.LowPart);
+	auto smooth_fps_buffer_index = 0;
+
+	FrameInfos frame_infos{
+		.frame = 0,
+		.delta_time = 0.0f,
+		.time = 0.0f,
+		.fps = 0.0f,
+		.pixel_buffer = pixel_buffer,
+		.pixel_buffer_width = BUFFER_WIDTH,
+		.pixel_buffer_height = BUFFER_HEIGHT
+	};
+
+	Scene* current_scene = new SceneA();
+
+	MSG msg;
+
+	bool loop = true;
+	RECT rc;
+	GetClientRect(hWnd, &rc);
+
+	while (loop)
 	{
-		static unsigned char frame = 0;
-		frame++;
+		QueryPerformanceCounter(&t_end);
 
-		ball_pos_x += ball_vit_x;
-		ball_pos_y += ball_vit_y;
+		const unsigned int elapsed = t_end.LowPart - t_start.LowPart;
+		frame_infos.frame++;
+		frame_infos.delta_time = static_cast<float>(elapsed) / static_cast<float>(frequency);
+		frame_infos.time += frame_infos.delta_time;
+		frame_infos.fps = 1.0f / frame_infos.delta_time;
+		frame_infos.smooth_fps_buffer[smooth_fps_buffer_index++ % SMOOTH_FPS_BUFFER_SIZE] = frame_infos.fps;
 
-		if (ball_pos_x + BALL_RADIUS > BUFFER_WIDTH)
+		frame_infos.smooth_fps = 0;
+		for (const float fps : frame_infos.smooth_fps_buffer)
+			frame_infos.smooth_fps += fps;
+		frame_infos.smooth_fps /= SMOOTH_FPS_BUFFER_SIZE;
+
+		t_start = t_end;
+
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
-			ball_pos_x = BUFFER_WIDTH - BALL_RADIUS;
-			ball_vit_x *= -1;
-
-			//CreateThread(0, 0, PlayBeep, 0, 0, 0); creating a thread is so simple with windows api omg
-		}
-
-		if (ball_pos_x - BALL_RADIUS < 0)
-		{
-			ball_pos_x = BALL_RADIUS;
-			ball_vit_x *= -1;
-
-			//CreateThread(0, 0, PlayBeep, 0, 0, 0);
-		}
-
-		if (ball_pos_y + BALL_RADIUS > BUFFER_HEIGHT)
-		{
-			ball_pos_y = BUFFER_HEIGHT - BALL_RADIUS;
-			ball_vit_y *= -1;
-
-			//CreateThread(0, 0, PlayBeep, 0, 0, 0);
-		}
-
-		if (ball_pos_y - BALL_RADIUS < 0)
-		{
-			ball_pos_y = BALL_RADIUS;
-			ball_vit_y *= -1;
-
-			//CreateThread(0, 0, PlayBeep, 0, 0, 0);
-		}
-
-		unsigned int* ptr = pixel_buffer;
-		for (int y = 0; y < BUFFER_HEIGHT; y++)
-		{
-			int diff_y = ball_pos_y - y;
-			int dy2 = diff_y * diff_y;
-
-			for (int x = 0; x < BUFFER_WIDTH; x++)
+			if (
+				msg.message == WM_QUIT ||
+				msg.message == WM_KEYDOWN && msg.wParam == VK_ESCAPE)
 			{
-				int diff_x = ball_pos_x - x;
-				if (diff_x * diff_x + dy2 <= (BALL_RADIUS * BALL_RADIUS))
-					*ptr++ = 0xffffffff;
-				else
-					*ptr++ = (frame << 16) | ((y + x) & 0xFF);
+				loop = false;
+				break;
 			}
+
+			if (msg.message == WM_SIZE)
+				GetClientRect(hWnd, &rc);
+
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
+		// update current scene
+		current_scene->update(frame_infos);
 
 		// blit bitmap
 
-		RECT rc;
-		GetClientRect(hWnd, &rc);
 
-		StretchDIBits(hdc, 0, 0, rc.right, rc.bottom, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, pixel_buffer, &bmi, DIB_RGB_COLORS, SRCCOPY);
+		StretchDIBits(hdc, 0, 0, rc.right, rc.bottom, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, pixel_buffer, &bmi, DIB_RGB_COLORS,
+		              SRCCOPY);
 
-		MSG msg;
+#ifdef DEBUG
+		char fps_text[32];
+		wsprintf(fps_text, "FPS: %d", static_cast<int>(frame_infos.smooth_fps));
 
-		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-			DispatchMessage(&msg);
+		SetTextColor(hdc, RGB(255, 255, 255));
+		SetBkMode(hdc, TRANSPARENT);
+
+		TextOut(hdc, 10, 10, fps_text, lstrlen(fps_text));
+#endif
+
+		//DwmFlush();
 	}
 
 	ExitProcess(0);

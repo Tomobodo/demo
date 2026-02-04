@@ -14,9 +14,9 @@ INCLUDES = \
 	-I"$(KITS_DIR)/Include/$(SDK_VERSION)/ucrt" \
 	-I"$(VS_DIR)/VC/Tools/MSVC/$(MSVC_VERSION)/include"
 
-LIB_SDK = "C:/Program Files (x86)/Windows Kits/10/Lib/$(SDK_VERSION)/um/x86"
-LIB_CRT = "C:/Program Files (x86)/Windows Kits/10/Lib/$(SDK_VERSION)/ucrt/x86"
-LIB_MSVC = "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/$(MSVC_VERSION)/lib/x86"
+LIB_SDK = "$(KITS_DIR)/Lib/$(SDK_VERSION)/um/x86"
+LIB_CRT = "$(KITS_DIR)/Lib/$(SDK_VERSION)/ucrt/x86"
+LIB_MSVC = "$(VS_DIR)/VC/Tools/MSVC/$(MSVC_VERSION)/lib/x86"
 
 LIBPATHS = \
 	/LIBPATH:$(LIB_SDK) \
@@ -28,14 +28,14 @@ CONFIG ?= Release
 TARGET_BASE = demo
 OUTDIR = build/$(CONFIG)
 
-LIBS = kernel32.lib user32.lib gdi32.lib
+LIBS = kernel32.lib user32.lib gdi32.lib dwmapi.lib
 
 ifeq ($(CONFIG),Debug)
 	TARGET = $(OUTDIR)/$(TARGET_BASE).exe
 	OBJDIR = $(OUTDIR)/obj
 	LINK = $(LINK_MS)
 
-	CFLAGS_CFG = -Od -Zi -GS-
+	CFLAGS_CFG = -Od -Z7 -GS- -DDEBUG
 	LDFLAGS_CFG = \
 		$(LIBPATHS) \
 		//NODEFAULTLIB \
@@ -49,7 +49,7 @@ else ifeq ($(CONFIG),Release)
 	OBJDIR = $(OUTDIR)/obj
 	LINK = $(LINK_CR)
 
-	CFLAGS_CFG = -Os -GS- -GR- -EHa- -Zl -Gw -Gy
+	CFLAGS_CFG = -Os -GS- -EHa- -Zl -Gw -Gy
 
 	LDFLAGS_CFG = \
 		$(LIBPATHS) \
@@ -88,7 +88,7 @@ $(OBJDIR):
 	mkdir -p "$(OBJDIR)"
 
 $(OBJDIR)/%.obj: src/%.cpp | $(OBJDIR)
-	$(CC) $(CFLAGS) -Fo"$@" "$<"
+	$(CC) $(CFLAGS) -Oi -std:c++latest -GR- -Fo"$@" "$<"
 
 $(TARGET): $(OBJS)
 	mkdir -p "$(OUTDIR)"
