@@ -1,7 +1,7 @@
 ﻿SDK_VERSION = 10.0.26100.0
-MSVC_VERSION = 14.44.35207
+MSVC_VERSION = 14.50.35717
 
-VS_DIR = C:/Program Files/Microsoft Visual Studio/2022/Community
+VS_DIR = C:/Program Files/Microsoft Visual Studio/18/Community
 KITS_DIR = C:/Program Files (x86)/Windows Kits/10
 
 CC = "$(VS_DIR)/VC/Tools/MSVC/$(MSVC_VERSION)/bin/Hostx64/x86/cl.exe"
@@ -24,6 +24,8 @@ LIBPATHS = \
 	/LIBPATH:$(LIB_MSVC)
 
 CONFIG ?= Release
+
+DEFINES = -DFULLSCREEN
 
 TARGET_BASE = demo
 OUTDIR = build/$(CONFIG)
@@ -68,6 +70,7 @@ CFLAGS = -nologo -c $(INCLUDES) $(CFLAGS_CFG)
 
 SRCS = $(wildcard src/*.cpp)
 OBJS = $(patsubst src/%.cpp,$(OBJDIR)/%.obj,$(SRCS))
+ASMDIR = $(OUTDIR)/asm
 
 .PHONY: all clean rebuild debug release
 
@@ -88,8 +91,16 @@ $(OBJDIR):
 	mkdir -p "$(OBJDIR)"
 
 $(OBJDIR)/%.obj: src/%.cpp | $(OBJDIR)
-	$(CC) $(CFLAGS) -Oi -std:c++latest -GR- -Fo"$@" "$<"
+	$(CC) $(CFLAGS) $(DEFINES) -Oi -std:c++latest -GR- -Fo"$@" "$<"
 
 $(TARGET): $(OBJS)
 	mkdir -p "$(OUTDIR)"
-	$(LINK) $(LDFLAGS_CFG) $(OBJS) $(LIBS) /OUT:"$(TARGET)"
+	$(LINK) $(LDFLAGS_CFG) $(OBJS) $(LIBS)  /OUT:"$(TARGET)"
+
+asm: $(SRCS)
+	@mkdir -p "$(ASMDIR)"
+	@for src in $(SRCS); do \
+		base=$$(basename $$src .cpp); \
+		$(CC) $(CFLAGS) -Oi -std:c++latest -GR- -FAsc -Fa"$(ASMDIR)/$$base.asm" "$$src"; \
+	done
+	@echo "Assembleur généré dans $(ASMDIR)"

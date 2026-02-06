@@ -5,6 +5,7 @@
 class SceneA : public Scene
 {
 public:
+	SceneA();
 	void update(const FrameInfos& frame_infos) override;
 
 private:
@@ -14,4 +15,5 @@ private:
 
 	float ball_x = 0.f, ball_y = 0.f, ball_z = 100.0f;
 	float ball_vel_x = 50.f, ball_vel_y = 50.f, ball_vel_z = 50;
+	float sin_lut[256] = {0};
 };

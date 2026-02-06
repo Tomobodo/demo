@@ -6,11 +6,11 @@
 #include "scene_a.hpp"
 #include "frame_infos.h"
 
-constexpr int BUFFER_WIDTH = 850;
-constexpr int BUFFER_HEIGHT = 480;
+//constexpr int BUFFER_WIDTH = 850;
+//constexpr int BUFFER_HEIGHT = 480;
 
-//constexpr int BUFFER_WIDTH = 1920;
-//constexpr int BUFFER_HEIGHT = 1080;
+constexpr int BUFFER_WIDTH = 1920;
+constexpr int BUFFER_HEIGHT = 1080;
 
 unsigned int pixel_buffer[BUFFER_WIDTH * BUFFER_HEIGHT];
 
@@ -39,13 +39,17 @@ void* __cdecl memset(void* dest, int c, size_t count)
 }
 }
 
-
 extern "C" void entry()
 {
 	HWND hWnd = CreateWindowEx(0,
 	                           reinterpret_cast<LPCSTR>(0x8000), nullptr,
+#ifdef FULLSCREEN
 	                           WS_POPUP | WS_VISIBLE | WS_MAXIMIZE,
 	                           0, 0, 0, 0,
+#else
+	                           WS_POPUP | WS_VISIBLE,
+	                           0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
+#endif
 	                           nullptr, nullptr, nullptr, nullptr
 	);
 
