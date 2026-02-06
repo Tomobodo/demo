@@ -4,7 +4,7 @@
 
 struct FrameInfos
 {
-	unsigned int frame;
+	unsigned frame;
 	float delta_time;
 	float time;
 	float fps;
