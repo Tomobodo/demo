@@ -24,8 +24,12 @@ LIBPATHS = \
 	/LIBPATH:$(LIB_MSVC)
 
 CONFIG ?= Release
+PLATFORM ?= win32
 
-DEFINES = -DFULLSCREEN
+WIDTH = 854
+HEIGHT =  480
+
+DEFINES = -DFULLSCREEN -DBUFFER_WIDTH=$(WIDTH) -DBUFFER_HEIGHT=$(HEIGHT) -DSHOW_FPS -DPLATFORM=$(PLATFORM)
 
 TARGET_BASE = demo
 OUTDIR = build/$(CONFIG)
@@ -78,11 +82,19 @@ all: $(TARGET)
 
 debug:
 	$(MAKE) CONFIG=Debug clean
-	$(MAKE) CONFIG=Debug all
+	$(MAKE) PLATFORM=win32 CONFIG=Debug all
 
 release:
 	$(MAKE) CONFIG=Release clean
-	$(MAKE) CONFIG=Release all
+	$(MAKE) PLATFORM=win32 CONFIG=Release all
+
+wasm_debug:
+	$(MAKE) CONFIG=Debug clean
+	$(MAKE) PLATFORM=wasm32 CONFIG=Debug all
+
+wasm_release:
+	$(MAKE) CONFIG=Release clean
+	$(MAKE) PLATFORM=wasm43 CONFIG=Release all
 
 clean:
 	rm -rf "$(OBJDIR)" "$(TARGET)"

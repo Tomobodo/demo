@@ -4,94 +4,52 @@
 constexpr auto PI = 3.14159265359f;
 constexpr auto HPI = PI / 2.0f;
 
-SceneA::SceneA()
+void scene_a(void* data, const FrameInfos& frame_infos)
 {
-	for (int i = 0; i < 256; i++)
-		sin_lut[i] = fast_sin(i * PI / 128.0f);
-}
+	constexpr float HVEL = 100.0f;
+	constexpr int BSIZE = 50;
+	constexpr int BSIZE_SQUARED = BSIZE * BSIZE;
 
-void SceneA::update(const FrameInfos& frame_infos)
-{
-	constexpr float GRAVITY = -50.81;
+	const auto h_range = frame_infos.pixel_buffer_width - BSIZE * 2;
+	const auto v_range = frame_infos.pixel_buffer_height - BSIZE * 2;
 
-	float ball_size = 10 + ((50 - 10) * (ball_z / 100.0f));
+	const auto ball_incr = HVEL * frame_infos.time;
 
-	ball_vel_z += GRAVITY * frame_infos.delta_time;
+	const auto draw_ball_x = abs(
+		(static_cast<int>(ball_incr + h_range) % (h_range * 2)) - h_range) + BSIZE;
 
-	ball_x += ball_vel_x * frame_infos.delta_time;
-	ball_y += ball_vel_y * frame_infos.delta_time;
-	ball_z += ball_vel_z * frame_infos.delta_time;
+	const auto draw_ball_y = abs(
+		(static_cast<int>(ball_incr + v_range) % (v_range * 2)) - v_range) + BSIZE;
 
-	if (ball_x + ball_size > frame_infos.pixel_buffer_width)
-	{
-		ball_x = frame_infos.pixel_buffer_width - ball_size;
-		ball_vel_x *= -1;
-	}
+	unsigned* ptr = frame_infos.pixel_buffer;
 
-	if (ball_x - ball_size < 0)
-	{
-		ball_x = ball_size;
-		ball_vel_x *= -1;
-	}
-
-	if (ball_y + ball_size > frame_infos.pixel_buffer_height)
-	{
-		ball_y = frame_infos.pixel_buffer_height - ball_size;
-		ball_vel_y *= -1;
-	}
-
-	if (ball_y - ball_size < 0)
-	{
-		ball_y = ball_size;
-		ball_vel_y *= -1;
-	}
-
-	if (ball_z - ball_size < 0)
-	{
-		ball_z = ball_size;
-		ball_vel_z *= -1;
-	}
-
-	unsigned int* ptr = frame_infos.pixel_buffer;
-	const float ball_size_squared = ball_size * ball_size;
-
-	unsigned int cells_size_shift = 6;
-	unsigned int cells_per_row = frame_infos.pixel_buffer_width / cells_size_shift;
-	if ((cells_per_row & 1) == 0)
-		cells_per_row++;
-
-	unsigned int x_cell = 0;
-	unsigned int y_cell = 0;
 	constexpr float BACKGROUND_CIRCLE_RADIUS = 200.f;
 
 	const int y_offset = fast_sin(frame_infos.time) * BACKGROUND_CIRCLE_RADIUS;
 	const int x_offset = fast_cos(frame_infos.time) * BACKGROUND_CIRCLE_RADIUS;
 
-	const int gerbouli_intensity = fast_sin(frame_infos.time * 0.01f) * 100;
-	//const int gerbouli_intensity = sin_lut[static_cast<int>(frame_infos.time * 2) & 255] * 100;
+	const int bg_fx_strength = fast_sin(frame_infos.time * 0.01f) * 100;
 
 	for (int y = 0; y < frame_infos.pixel_buffer_height; y++)
 	{
-		y_cell = (y + y_offset) >> cells_size_shift;
+		constexpr unsigned int CELLS_SIZE_SHIFT = 6;
+		const unsigned y_cell = (y + y_offset) >> CELLS_SIZE_SHIFT;
 
-		const int diff_y = static_cast<int>(ball_y) - y;
+		const int diff_y = draw_ball_y - y;
 		const int dy2 = diff_y * diff_y;
 
-
-		const int x_line_offset = fast_sin((y + y_offset + frame_infos.time * 100.0f) / 100.0f) * gerbouli_intensity;
-		// const int x_line_offset = sin_lut[static_cast<int>(y + y_offset + frame_infos.time * 10.0f) & 255] *
-		// 	gerbouli_intensity;
+		const int x_line_offset = fast_sin((y + y_offset + frame_infos.time * 100.0f) / 100.0f) * bg_fx_strength;
 
 		for (int x = 0; x < frame_infos.pixel_buffer_width; x++)
 		{
-			x_cell = (x + x_offset + x_line_offset) >> cells_size_shift;
+			const unsigned x_cell = (x + x_offset + x_line_offset) >> CELLS_SIZE_SHIFT;
 
-			const int diff_x = static_cast<int>(ball_x) - x;
-			if (diff_x * diff_x + dy2 <= ball_size_squared)
+			const int diff_x = draw_ball_x - x;
+			if (diff_x * diff_x + dy2 <= BSIZE_SQUARED)
 				*ptr++ = 0xffffffff;
 			else // Draw background
 			{
-				constexpr unsigned int PALETTE[] = {0x1b5abf, 0x1349a1};
+				constexpr unsigned PALETTE[] = {0x1b5abf, 0x1349a1};
 				*ptr++ = PALETTE[(x_cell ^ y_cell) & 1];
 			}
 		}

@@ -2,21 +2,17 @@
 #include <windows.h>
 #include <dwmapi.h>
 
-#include "scene.hpp"
 #include "scene_a.hpp"
 #include "frame_infos.h"
 
-//constexpr int BUFFER_WIDTH = 850;
-//constexpr int BUFFER_HEIGHT = 480;
-
-constexpr int BUFFER_WIDTH = 1920;
-constexpr int BUFFER_HEIGHT = 1080;
-
-unsigned int pixel_buffer[BUFFER_WIDTH * BUFFER_HEIGHT];
-
-#ifdef DEBUG
-extern "C" int _fltused = 0;
+#ifndef BUFFER_WIDTH
+#define BUFFER_WIDTH 640
 #endif
+
+#ifndef BUFFER_HEIGHT
+#define BUFFER_HEIGHT 480
+#endif
+
 
 void* operator new(size_t size)
 {
@@ -37,9 +33,16 @@ void* __cdecl memset(void* dest, int c, size_t count)
 		*p++ = static_cast<unsigned char>(c);
 	return dest;
 }
-}
 
-extern "C" void entry()
+// need to be set for the compiler to know we use float
+int _fltused = 0;
+
+unsigned int pixel_buffer[BUFFER_WIDTH * BUFFER_HEIGHT];
+
+
+typedef void (*SceneFunc)(void*, const FrameInfos&);
+
+void entry()
 {
 	HWND hWnd = CreateWindowEx(0,
 	                           reinterpret_cast<LPCSTR>(0x8000), nullptr,
@@ -80,7 +83,8 @@ extern "C" void entry()
 		.pixel_buffer_height = BUFFER_HEIGHT
 	};
 
-	Scene* current_scene = new SceneA();
+	const SceneFunc current_scene = &scene_a;
+	void* current_scene_data = nullptr;
 
 	MSG msg;
 
@@ -123,15 +127,13 @@ extern "C" void entry()
 			DispatchMessage(&msg);
 		}
 		// update current scene
-		current_scene->update(frame_infos);
+		current_scene(current_scene_data, frame_infos);
 
 		// blit bitmap
-
-
 		StretchDIBits(hdc, 0, 0, rc.right, rc.bottom, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, pixel_buffer, &bmi, DIB_RGB_COLORS,
 		              SRCCOPY);
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(SHOW_FPS)
 		char fps_text[32];
 		wsprintf(fps_text, "FPS: %d", static_cast<int>(frame_infos.smooth_fps));
 
@@ -145,4 +147,5 @@ extern "C" void entry()
 	}
 
 	ExitProcess(0);
+}
 }
