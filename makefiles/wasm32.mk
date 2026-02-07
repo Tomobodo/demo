@@ -1,12 +1,12 @@
 ﻿CC = C:/msys64/ucrt64/bin/clang++.exe
-SRCS = src/main_wasm.cpp
 
-OBJS = $(patsubst src/%.cpp,$(OBJDIR)/%.obj,$(SRCS))
+INCLUDES= \
+	-I"src/common"
 
-CFLAGS = -O3 -Wall -std=c++latest
+CFLAGS = $(INCLUDES) -O3 -std=c++23 -fms-extensions
 LDFLAGS =
 
-$(OBJDIR)/%.obj: src/%.cpp | $(OBJDIR)
+$(OBJDIR)/%.obj: %.cpp | $(OBJDIR)
 	$(CC) $(CFLAGS) $(DEFINES) -c "$<" -o "$@"
 
 $(TARGET): $(OBJS)

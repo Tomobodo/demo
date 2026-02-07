@@ -1,5 +1,5 @@
 ﻿#pragma once
 
-#include "frame_infos.h"
+struct FrameInfos;
 
 void scene_a(void* data, const FrameInfos& frame_infos);

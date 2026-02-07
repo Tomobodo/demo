@@ -13,17 +13,6 @@
 #define BUFFER_HEIGHT 480
 #endif
 
-
-void* operator new(size_t size)
-{
-	return HeapAlloc(GetProcessHeap(), 0, size);
-}
-
-void operator delete(void* p, size_t size) noexcept
-{
-	if (p) HeapFree(GetProcessHeap(), 0, p);
-}
-
 extern "C" {
 #pragma function(memset)
 void* __cdecl memset(void* dest, int c, size_t count)

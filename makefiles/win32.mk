@@ -10,6 +10,7 @@ LINK_MS = "$(VS_DIR)/VC/Tools/MSVC/$(MSVC_VERSION)/bin/Hostx64/x86/link.exe"
 LINK_CR = Crinkler.exe
 
 INCLUDES = \
+	-I"src/common" \
 	-I"$(KITS_DIR)/Include/$(SDK_VERSION)/um" \
 	-I"$(KITS_DIR)/Include/$(SDK_VERSION)/shared" \
 	-I"$(KITS_DIR)/Include/$(SDK_VERSION)/ucrt" \
@@ -58,13 +59,7 @@ endif
 
 CFLAGS = -nologo -c $(INCLUDES) $(CFLAGS_CFG)
 
-SRCS = src/main_win.cpp \
-	src/maths.cpp \
-	src/scene_a.cpp
-
-OBJS = $(patsubst src/%.cpp,$(OBJDIR)/%.obj,$(SRCS))
-
-$(OBJDIR)/%.obj: src/%.cpp | $(OBJDIR)
+$(OBJDIR)/%.obj: %.cpp | $(OBJDIR)
 	$(CC) $(CFLAGS) $(DEFINES) -Oi -std:c++latest -GR- -Fo"$@" "$<"
 
 $(TARGET): $(OBJS)
