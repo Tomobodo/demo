@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <dwmapi.h>
 
+#include "scene.hpp"
 #include "scene_a.hpp"
 #include "frame_infos.h"
 
@@ -29,7 +30,6 @@ int _fltused = 0;
 unsigned int pixel_buffer[BUFFER_WIDTH * BUFFER_HEIGHT];
 
 
-typedef void (*SceneFunc)(void*, const FrameInfos&);
 
 void entry()
 {

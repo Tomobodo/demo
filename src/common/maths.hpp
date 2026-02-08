@@ -1,8 +1,7 @@
 ﻿#pragma once
 
-extern "C" {
-int __cdecl abs(int _X);
-}
+extern "C" int __cdecl abs(int);
+#pragma intrinsic(abs)
 
 float fast_sin(float angle);
 

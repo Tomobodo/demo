@@ -25,7 +25,6 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 	unsigned* ptr = frame_infos.pixel_buffer;
 
 	constexpr float BACKGROUND_CIRCLE_RADIUS = 200.f;
-
 	const int y_offset = fast_sin(frame_infos.time) * BACKGROUND_CIRCLE_RADIUS;
 	const int x_offset = fast_cos(frame_infos.time) * BACKGROUND_CIRCLE_RADIUS;
 
@@ -50,7 +49,7 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 				*ptr++ = 0xffffffff;
 			else // Draw background
 			{
-				constexpr unsigned PALETTE[] = {0x1b5abf, 0x1349a1};
+				constexpr unsigned PALETTE[] = {0xff1b5abf, 0xff1349a1};
 				*ptr++ = PALETTE[(x_cell ^ y_cell) & 1];
 			}
 		}

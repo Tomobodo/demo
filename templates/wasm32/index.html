@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Demo Wasm</title>
+</head>
+<body>
+<canvas height="@BUFFER_HEIGHT@" id="canvas" width="@BUFFER_WIDTH@"></canvas>
+
+<script>
+    async function init() {
+        const response = await fetch('@TARGET_NAME@.wasm');
+        const mem = new WebAssembly.Memory({initial: 20});
+        const bytes = await response.arrayBuffer();
+        const {instance} = await WebAssembly.instantiate(bytes, {
+            env: {
+                memory: mem,
+                sinf: Math.sin,
+                cosf: Math.cos,
+                abs: Math.abs
+            }
+        });
+
+        const BUFFER_WIDTH=@BUFFER_WIDTH@
+        const BUFFER_HEIGHT=@BUFFER_HEIGHT@
+
+        const {get_pixel_buffer, update, memory} = instance.exports
+        const ptr = get_pixel_buffer()
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const imgDataArray = new Uint8ClampedArray(memory.buffer, ptr, BUFFER_WIDTH * BUFFER_HEIGHT * 4);
+        const imgData = new ImageData(imgDataArray, BUFFER_WIDTH, BUFFER_HEIGHT);
+
+        let i = 0
+        function loop(time) {
+            update(0.016);
+
+            ctx.putImageData(imgData, 0, 0);
+
+            requestAnimationFrame(loop);
+            console.log(imgData.data[i])
+            i++
+        }
+
+        loop(0);
+    }
+
+    init();
+</script>
+</body>
+</html>
