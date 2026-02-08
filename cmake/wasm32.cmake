@@ -58,7 +58,6 @@ endif ()
 if (HOTRELOAD)
 	add_custom_command(
 			TARGET ${TARGET_NAME} POST_BUILD
-			COMMAND curl -s http://localhost:8082/
-			COMMENT "Notifying browser of new wasm build"
+			COMMAND curl -s http://localhost:8082/ --output /dev/null --max-time 1 || cmake -E true
 	)
 endif ()

@@ -13,87 +13,146 @@
         }
 
         canvas {
-            width: 100%;
+            position: relative;
             height: 100%;
+            aspect-ratio: 1.3333333;
+
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .container {
-            max-width: @BUFFER_WIDTH@px;
-            max-height: @BUFFER_HEIGHT@px;
-            position: relative;
+        .canvas-overlay {
+            position: absolute;
+            box-sizing: border-box;
+            z-index: 1000;
+            pointer-events: none;
+            height: 100%;
+            aspect-ratio: 1.333333;
+            padding: 10px 10px;
 
             .fps {
-                position: absolute;
                 font-size: 16px;
                 font-weight: bold;
                 text-transform: uppercase;
                 color: white;
-                top: 10px;
-                left: 10px;
                 font-family: sans-serif;
+                z-index: 1000;
             }
+        }
+
+        .canvas-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: @BUFFER_WIDTH@px;
+            max-height: @BUFFER_HEIGHT@px;
+        }
+
+        main {
+            width: fit-content;
+        }
+
+        #seekbar {
+            width: 100%;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <canvas height="@BUFFER_HEIGHT@" id="canvas" width="@BUFFER_WIDTH@"></canvas>
-    <div class="fps">FPS: </div>
-</div>
-<button onclick="load()">reload</button>
-<button onclick="fullscreen()">fullscreen</button>
+    <main>
+        <div class="canvas-container">
+            <canvas height="@BUFFER_HEIGHT@" id="canvas" width="@BUFFER_WIDTH@">
+            </canvas>
+            <div class="canvas-overlay">
+                <div class="fps">FPS: </div>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="progress">
+               <input type="range" id="seekbar" min="0" step="1"></input>
+            </div>
+            <button id="playpause" onclick="onPlayPause()">pause</button>
+            <button onclick="load()">reload</button>
+            <button onclick="fullscreen()">fullscreen</button>
+        </div>
+    </main>
 
-<script>
-    const BUFFER_WIDTH = @BUFFER_WIDTH@
-    const BUFFER_HEIGHT = @BUFFER_HEIGHT@
+    <script>
+        const BUFFER_WIDTH = @BUFFER_WIDTH@
+        const BUFFER_HEIGHT = @BUFFER_HEIGHT@
 
-    const BYTES_COUNT = BUFFER_WIDTH * BUFFER_HEIGHT * 4
+        const BYTES_COUNT = BUFFER_WIDTH * BUFFER_HEIGHT * 4
 
-    const memory = new WebAssembly.Memory({
-        initial: @INITIAL_MEMORY_PAGES@,
-        maximum: @MAX_MEMORY_PAGES@,
-        shared: true
-    });
-
-    let exports = null
-
-    let imageData = new ImageData(new Uint8ClampedArray(BYTES_COUNT), BUFFER_WIDTH, BUFFER_HEIGHT)
-
-    async function load() {
-        const response = await fetch('demo.wasm?' + Date.now());
-        const bytes = await response.arrayBuffer();
-        const {instance} = await WebAssembly.instantiate(bytes, {
-            env: {
-                memory,
-                sinf: Math.sin,
-                cosf: Math.cos,
-                abs: Math.abs
-            }
+        const memory = new WebAssembly.Memory({
+            initial: @INITIAL_MEMORY_PAGES@,
+            maximum: @MAX_MEMORY_PAGES@,
+            shared: true
         });
 
-        exports = instance.exports
-    }
-    async function init() {
-        const ws = new WebSocket('ws://localhost:8081');
-        ws.onmessage = (e) => {
-            if (e.data === 'reload') {
-                console.log('New wasm build, reloading...');
-                load();
-            }
+        let isPlaying = true;
+
+        let exports = null
+
+        let imageData = new ImageData(new Uint8ClampedArray(BYTES_COUNT), BUFFER_WIDTH, BUFFER_HEIGHT)
+
+        let canvas, ctx, fpsCounter;
+
+        const STATE_SIZE = 2 * 4;
+        let states = []
+
+        function onPlayPause() {
+            isPlaying = !isPlaying;
+            document.getElementById('playpause').innerHTML = isPlaying ? "Pause" : "Play"
         }
 
-        await load();
+        async function load() {
+            const response = await fetch('demo.wasm?' + Date.now());
+            const bytes = await response.arrayBuffer();
+            const {instance} = await WebAssembly.instantiate(bytes, {
+                env: {
+                    memory,
+                    sinf: Math.sin,
+                    cosf: Math.cos,
+                    abs: Math.abs
+                }
+            });
 
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+            exports = instance.exports
+        }
 
-        const fpsCounter = document.querySelector(".fps")
+        function copy_state() {
+            const state = memory.buffer.slice(exports.get_state(), exports.get_state() + STATE_SIZE)
+            return state;
+        }
 
-        let lastTime = 0
-        async function loop(currentTime) {
-            const dt = lastTime ? (currentTime - lastTime) / 1000 : 0;
-            lastTime = currentTime;
+        function set_state(state_index) {
+            if (state_index >= states.length)
+                state_index = states.length - 1;
 
+            if (state_index < 0)
+                state_index = 0;
+
+            const previous_state = states[state_index > 0 ? state_index - 1 : 0]
+            const state = states[state_index]
+
+            const state_view = new DataView(state)
+            const previous_state_view = new DataView(previous_state)
+
+            const state_time = state_view.getFloat32(0, true)
+            const previous_state_time = previous_state_view.getFloat32(0, true)
+
+            const delta_time = state_time - previous_state_time;
+
+            const offset = exports.get_state();
+            const view = new Uint8Array(memory.buffer);
+            const newState = new Uint8Array(state);
+
+            view.set(newState, offset);
+
+            updateCanvas(delta_time)
+        }
+
+        function updateCanvas(dt) {
             const cappedDt = Math.min(dt, 0.1)
             exports.update(cappedDt);
 
@@ -101,21 +160,60 @@
 
             imageData.data.set(new Uint8ClampedArray(memory.buffer, offset, BYTES_COUNT));
             ctx.putImageData(imageData, 0, 0);
-            const fps = (1.0 / dt).toFixed(2);
-            fpsCounter.innerHTML = "FPS: " + fps;
+            if (dt > 0) {
+                const fps = (1.0 / dt).toFixed(2);
+                fpsCounter.innerHTML = "FPS: " + fps;
+            }
+        }
+        async function init() {
+            const ws = new WebSocket('ws://localhost:8081');
+            ws.onmessage = (e) => {
+                if (e.data === 'reload') {
+                    console.log('New wasm build, reloading...');
+                    load();
+                }
+            }
 
-            requestAnimationFrame(loop);
+            await load();
+
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+
+            fpsCounter = document.querySelector(".fps")
+
+            let lastTime = 0
+
+            const seekbar = document.getElementById('seekbar')
+
+            seekbar.oninput = () => {
+                set_state(seekbar.value)
+            }
+
+            async function loop(currentTime) {
+                const dt = lastTime ? (currentTime - lastTime) / 1000 : 0;
+                lastTime = currentTime;
+
+                requestAnimationFrame(loop);
+
+                updateCanvas(isPlaying ? dt : 0)
+
+                if (!isPlaying) return
+
+                if (seekbar.value === seekbar.max)
+                    states.push(copy_state())
+                seekbar.max = states.length
+                seekbar.value++
+            }
+
+            loop(0);
         }
 
-        loop(0);
-    }
+        function fullscreen() {
+            const container = document.querySelector(".container")
+            container.requestFullscreen()
+        }
 
-    function fullscreen() {
-        const container = document.querySelector(".container")
-        container.requestFullscreen()
-    }
-
-    init();
-</script>
+        init();
+    </script>
 </body>
 </html>

@@ -1,0 +1,66 @@
+﻿{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "Debug_wasm32",
+      "displayName": "Wasm Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/wasm32/Debug",
+      "cacheVariables": {
+        "BUILD_WASM": "ON",
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm32.cmake",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "HOTRELOAD": "ON"
+      }
+    },
+    {
+      "name": "Debug_win32",
+      "displayName": "Win32 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/win32/Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "Release_wasm32",
+      "displayName": "Wasm32 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/wasm32/Release",
+      "cacheVariables": {
+        "BUILD_WASM": "ON",
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm32.cmake",
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_WASM_STRIP": "ON"
+      }
+    },
+    {
+      "name": "Release_win32",
+      "displayName": "Win32 Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/win32/Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_CRINKLER": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug_wasm32",
+      "configurePreset": "Debug_wasm32"
+    },
+    {
+      "name": "Release_wasm32",
+      "configurePreset": "Release_wasm32"
+    },
+    {
+      "name": "Debug_win32",
+      "configurePreset": "Debug_win32"
+    },
+    {
+      "name": "Release_win32",
+      "configurePreset": "Release_win32"
+    }
+  ]
+}

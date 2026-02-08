@@ -8,7 +8,7 @@ constexpr auto HPI = PI / 2.0f;
 void scene_a(void* data, const FrameInfos& frame_infos)
 {
 	constexpr float HVEL = 100.0f;
-	constexpr int BSIZE = 50;
+	constexpr int BSIZE = 32;
 	constexpr int BSIZE_SQUARED = BSIZE * BSIZE;
 
 	const auto h_range = static_cast<int>(frame_infos.pixel_buffer_width) - BSIZE * 2;
