@@ -23,8 +23,8 @@ target_link_options(
 		-Wl,--no-entry
 		-Wl,--export-all
 		-Wl,--allow-undefined
-		#-Wl,--import-memory
-		-Wl,--initial-memory=1310720
+		-Wl,--import-memory
+		#-Wl,--initial-memory=1310720
 )
 
 configure_file(

@@ -3,14 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Demo Wasm</title>
+
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .container {
+            max-width: @BUFFER_WIDTH@px;
+            max-height: @BUFFER_HEIGHT@px;
+            position: relative;
+
+            .fps {
+                position: absolute;
+                font-size: 16px;
+                font-weight: bold;
+                text-transform: uppercase;
+                color: white;
+                top: 10px;
+                left: 10px;
+                font-family: sans-serif;
+            }
+        }
+    </style>
 </head>
 <body>
-<canvas height="@BUFFER_HEIGHT@" id="canvas" width="@BUFFER_WIDTH@"></canvas>
+<div class="container">
+    <canvas height="@BUFFER_HEIGHT@" id="canvas" width="@BUFFER_WIDTH@"></canvas>
+    <div class="fps">FPS: </div>
+</div>
+<button onclick="fullscreen()">fullscreen</button>
 
 <script>
+    function fullscreen() {
+        const container = document.querySelector(".container")
+        container.requestFullscreen()
+    }
     async function init() {
+        const bytesNeeded = @BUFFER_WIDTH@ * @BUFFER_HEIGHT@ * 4;
+        const pagesNeeded = Math.ceil(bytesNeeded / 65536) + 2;
         const response = await fetch('@TARGET_NAME@.wasm');
-        const mem = new WebAssembly.Memory({initial: 20});
+        const mem = new WebAssembly.Memory({initial: pagesNeeded, maximum: 2 * pagesNeeded});
         const bytes = await response.arrayBuffer();
         const {instance} = await WebAssembly.instantiate(bytes, {
             env: {
@@ -30,18 +71,24 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
-        const imgDataArray = new Uint8ClampedArray(memory.buffer, ptr, BUFFER_WIDTH * BUFFER_HEIGHT * 4);
+        const imgDataArray = new Uint8ClampedArray(mem.buffer, ptr, BUFFER_WIDTH * BUFFER_HEIGHT * 4);
         const imgData = new ImageData(imgDataArray, BUFFER_WIDTH, BUFFER_HEIGHT);
 
-        let i = 0
-        function loop(time) {
-            update(0.016);
+        const fpsCounter = document.querySelector(".fps")
+
+        let lastTime = 0
+        function loop(currentTime) {
+            const dt = lastTime ? (currentTime - lastTime) / 1000 : 0;
+            lastTime = currentTime;
+
+            const cappedDt = Math.min(dt, 0.1)
+            update(cappedDt);
 
             ctx.putImageData(imgData, 0, 0);
+            const fps = (1.0 / dt).toFixed(2);
+            fpsCounter.innerHTML = "FPS: " + fps;
 
             requestAnimationFrame(loop);
-            console.log(imgData.data[i])
-            i++
         }
 
         loop(0);

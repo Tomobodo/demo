@@ -49,7 +49,11 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 				*ptr++ = 0xffffffff;
 			else // Draw background
 			{
+#ifdef __wasm__
+				constexpr unsigned PALETTE[] = {0xFFBF5A1B, 0xFFA14913};
+#else
 				constexpr unsigned PALETTE[] = {0xff1b5abf, 0xff1349a1};
+#endif
 				*ptr++ = PALETTE[(x_cell ^ y_cell) & 1];
 			}
 		}
