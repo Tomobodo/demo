@@ -40,51 +40,67 @@
     <canvas height="@BUFFER_HEIGHT@" id="canvas" width="@BUFFER_WIDTH@"></canvas>
     <div class="fps">FPS: </div>
 </div>
+<button onclick="load()">reload</button>
 <button onclick="fullscreen()">fullscreen</button>
 
 <script>
-    function fullscreen() {
-        const container = document.querySelector(".container")
-        container.requestFullscreen()
-    }
-    async function init() {
-        const bytesNeeded = @BUFFER_WIDTH@ * @BUFFER_HEIGHT@ * 4;
-        const pagesNeeded = Math.ceil(bytesNeeded / 65536) + 2;
-        const response = await fetch('@TARGET_NAME@.wasm');
-        const mem = new WebAssembly.Memory({initial: pagesNeeded, maximum: 2 * pagesNeeded});
+    const BUFFER_WIDTH = @BUFFER_WIDTH@
+    const BUFFER_HEIGHT = @BUFFER_HEIGHT@
+
+    const BYTES_COUNT = BUFFER_WIDTH * BUFFER_HEIGHT * 4
+
+    const memory = new WebAssembly.Memory({
+        initial: @INITIAL_MEMORY_PAGES@,
+        maximum: @MAX_MEMORY_PAGES@,
+        shared: true
+    });
+
+    let exports = null
+
+    let imageData = new ImageData(new Uint8ClampedArray(BYTES_COUNT), BUFFER_WIDTH, BUFFER_HEIGHT)
+
+    async function load() {
+        const response = await fetch('demo.wasm?' + Date.now());
         const bytes = await response.arrayBuffer();
         const {instance} = await WebAssembly.instantiate(bytes, {
             env: {
-                memory: mem,
+                memory,
                 sinf: Math.sin,
                 cosf: Math.cos,
                 abs: Math.abs
             }
         });
 
-        const BUFFER_WIDTH=@BUFFER_WIDTH@
-        const BUFFER_HEIGHT=@BUFFER_HEIGHT@
+        exports = instance.exports
+    }
+    async function init() {
+        const ws = new WebSocket('ws://localhost:8081');
+        ws.onmessage = (e) => {
+            if (e.data === 'reload') {
+                console.log('New wasm build, reloading...');
+                load();
+            }
+        }
 
-        const {get_pixel_buffer, update, memory} = instance.exports
-        const ptr = get_pixel_buffer()
+        await load();
 
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
-        const imgDataArray = new Uint8ClampedArray(mem.buffer, ptr, BUFFER_WIDTH * BUFFER_HEIGHT * 4);
-        const imgData = new ImageData(imgDataArray, BUFFER_WIDTH, BUFFER_HEIGHT);
-
         const fpsCounter = document.querySelector(".fps")
 
         let lastTime = 0
-        function loop(currentTime) {
+        async function loop(currentTime) {
             const dt = lastTime ? (currentTime - lastTime) / 1000 : 0;
             lastTime = currentTime;
 
             const cappedDt = Math.min(dt, 0.1)
-            update(cappedDt);
+            exports.update(cappedDt);
 
-            ctx.putImageData(imgData, 0, 0);
+            const offset = exports.get_pixel_buffer();
+
+            imageData.data.set(new Uint8ClampedArray(memory.buffer, offset, BYTES_COUNT));
+            ctx.putImageData(imageData, 0, 0);
             const fps = (1.0 / dt).toFixed(2);
             fpsCounter.innerHTML = "FPS: " + fps;
 
@@ -92,6 +108,11 @@
         }
 
         loop(0);
+    }
+
+    function fullscreen() {
+        const container = document.querySelector(".container")
+        container.requestFullscreen()
     }
 
     init();

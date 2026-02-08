@@ -1,5 +1,4 @@
-﻿#include "scene.hpp"
-#include "frame_infos.h"
+﻿#include "frame_infos.h"
 #include "scene_a.hpp"
 
 #ifndef BUFFER_WIDTH
@@ -12,30 +11,30 @@
 
 unsigned pixel_buffer[BUFFER_WIDTH * BUFFER_HEIGHT];
 
+FrameInfos infos;
+
 extern "C" {
-	unsigned * get_pixel_buffer()
-	{
-		return pixel_buffer;
-	}
+unsigned* get_pixel_buffer()
+{
+	return pixel_buffer;
+}
 
-	void update(float delta_time)
-	{
-		static unsigned frame = 0.f;
-		static float time = 0.f;
+void update(float delta_time)
+{
+	static unsigned frame = 0.f;
+	static float time = 0.f;
 
-		time += delta_time;
+	time += delta_time;
 
-		const FrameInfos infos {
-			.frame = frame++,
-			.delta_time = delta_time,
-			.time = time,
-			.fps = 1.0f / delta_time,
-			.pixel_buffer = pixel_buffer,
-			.pixel_buffer_width = BUFFER_WIDTH,
-			.pixel_buffer_height = BUFFER_HEIGHT
-		};
+	infos.frame = frame++;
+	infos.delta_time = delta_time;
+	infos.time = time;
+	infos.fps = 1.0f / delta_time;
+	infos.pixel_buffer = pixel_buffer;
+	infos.pixel_buffer_width = BUFFER_WIDTH;
+	infos.pixel_buffer_height = BUFFER_HEIGHT;
 
-		scene_a(nullptr, infos);
-	}
+	scene_a(nullptr, infos);
+}
 }
 

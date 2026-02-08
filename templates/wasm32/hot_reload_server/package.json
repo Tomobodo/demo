@@ -1,0 +1,15 @@
+{
+  "name": "hot_reload_server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "notify.js",
+  "scripts": {
+    "dev": "node notify.js"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  }
+}

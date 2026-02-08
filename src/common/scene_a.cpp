@@ -46,13 +46,13 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 
 			const int diff_x = draw_ball_x - x;
 			if (diff_x * diff_x + dy2 <= BSIZE_SQUARED)
-				*ptr++ = 0xffffffff;
+				*ptr++ = 0xFFFFFFFF;
 			else // Draw background
 			{
 #ifdef __wasm__
 				constexpr unsigned PALETTE[] = {0xFFBF5A1B, 0xFFA14913};
 #else
-				constexpr unsigned PALETTE[] = {0xff1b5abf, 0xff1349a1};
+				constexpr unsigned PALETTE[] = {0xFF1B5ABF, 0xFF1349A1};
 #endif
 				*ptr++ = PALETTE[(x_cell ^ y_cell) & 1];
 			}
