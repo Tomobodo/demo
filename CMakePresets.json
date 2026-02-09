@@ -15,11 +15,16 @@
     },
     {
       "name": "Debug_win32",
-      "displayName": "Win32 Debug",
       "generator": "Ninja",
+      "displayName": "Win32 Debug",
       "binaryDir": "${sourceDir}/build/win32/Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "Visual Studio x86"
+        }
       }
     },
     {
@@ -42,6 +47,11 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "USE_CRINKLER": "ON"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "Visual Studio x86"
+        }
       }
     }
   ],
