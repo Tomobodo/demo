@@ -18,7 +18,7 @@ target_compile_options(
 		${TARGET_NAME} PRIVATE
 		-ffreestanding
 		$<$<CONFIG:Release>: -O3 -Os>
-		$<$<CONFIG:Debug>: -g>
+		$<$<CONFIG:Debug>: -g -O0>
 		-std=c++23
 		-matomics
 		-mbulk-memory

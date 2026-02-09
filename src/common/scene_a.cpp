@@ -1,9 +1,13 @@
 ﻿#include "scene_a.hpp"
 #include "maths.hpp"
 #include "frame_infos.h"
+#include "color.hpp"
 
 constexpr auto PI = 3.14159265359f;
 constexpr auto HPI = PI / 2.0f;
+
+constexpr Color A = 0xFF1B5ABF, B = 0xFF1349A1, C = 0xFFEB5E13, D = 0xFFBF5A08;
+Color BG_PALETTE[2] = {0,0};
 
 void scene_a(void* data, const FrameInfos& frame_infos)
 {
@@ -30,6 +34,11 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 
 	const int bg_fx_strength = fast_sin(frame_infos.time * 0.01f) * 100;
 
+	float t = fast_sin(frame_infos.time * 0.1f) / 2.0f + 0.5f;
+
+	BG_PALETTE[0] = lerp_color(A, C, t),
+	BG_PALETTE[1] = lerp_color(B, D, t);
+
 	for (int y = 0; y < frame_infos.pixel_buffer_height; y++)
 	{
 		constexpr unsigned int CELLS_SIZE_SHIFT = 6;
@@ -49,12 +58,7 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 				*ptr++ = 0xFFFFFFFF;
 			else // Draw background
 			{
-#ifdef __wasm__
-				constexpr unsigned PALETTE[] = {0xFFBF5A1B, 0xFFA14913};
-#else
-				constexpr unsigned PALETTE[] = {0xFF1B5ABF, 0xFF1349A1};
-#endif
-				*ptr++ = PALETTE[(x_cell ^ y_cell) & 1];
+				*ptr++ = BG_PALETTE[((x_cell ^ y_cell) & 1)];
 			}
 		}
 	}

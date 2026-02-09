@@ -1,5 +1,5 @@
-﻿#include "frame_infos.h"
-#include "scene_a.hpp"
+﻿#include "common/frame_infos.h"
+#include "common/scene_a.hpp"
 
 #ifndef BUFFER_WIDTH
 #define BUFFER_WIDTH 640
@@ -45,15 +45,18 @@ void update(float delta_time)
 {
 	state.time += delta_time;
 
-	infos.frame = state.frame++;
-	infos.delta_time = delta_time;
-	infos.time = state.time;
-	infos.fps = 1.0f / delta_time;
-	infos.pixel_buffer = pixel_buffer;
-	infos.pixel_buffer_width = BUFFER_WIDTH;
-	infos.pixel_buffer_height = BUFFER_HEIGHT;
+	if (delta_time > 0)
+	{
+		infos.frame = state.frame++;
+		infos.delta_time = delta_time;
+		infos.time = state.time;
+		infos.fps = 1.0f / delta_time;
+		infos.pixel_buffer = pixel_buffer;
+		infos.pixel_buffer_width = BUFFER_WIDTH;
+		infos.pixel_buffer_height = BUFFER_HEIGHT;
 
-	scene_a(nullptr, infos);
+		scene_a(nullptr, infos);
+	}
 }
 }
 

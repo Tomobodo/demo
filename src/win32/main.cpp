@@ -2,9 +2,9 @@
 #include <windows.h>
 #include <dwmapi.h>
 
-#include "scene.hpp"
-#include "scene_a.hpp"
-#include "frame_infos.h"
+#include "common/scene.hpp"
+#include "common/scene_a.hpp"
+#include "common/frame_infos.h"
 
 #ifndef BUFFER_WIDTH
 #define BUFFER_WIDTH 640
@@ -13,6 +13,8 @@
 #ifndef BUFFER_HEIGHT
 #define BUFFER_HEIGHT 480
 #endif
+
+constexpr float ASPECT_RATIO = (float)BUFFER_WIDTH / (float)BUFFER_HEIGHT;
 
 extern "C" {
 #pragma function(memset)
@@ -81,6 +83,11 @@ void entry()
 	RECT rc;
 	GetClientRect(hWnd, &rc);
 
+	const int dest_width = (float)rc.bottom * ASPECT_RATIO;
+	const int blit_x = (rc.right - dest_width) / 2;
+
+	FillRect(hdc, &rc, (HBRUSH)GetStockObject(BLACK_BRUSH));
+
 	while (loop)
 	{
 		QueryPerformanceCounter(&t_end);
@@ -119,7 +126,8 @@ void entry()
 		current_scene(current_scene_data, frame_infos);
 
 		// blit bitmap
-		StretchDIBits(hdc, 0, 0, rc.right, rc.bottom, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, pixel_buffer, &bmi, DIB_RGB_COLORS,
+		StretchDIBits(hdc,
+			blit_x, 0, dest_width, rc.bottom, 0, 0, BUFFER_WIDTH, BUFFER_HEIGHT, pixel_buffer, &bmi, DIB_RGB_COLORS,
 		              SRCCOPY);
 
 #if defined(DEBUG) || defined(SHOW_FPS)
@@ -129,7 +137,7 @@ void entry()
 		SetTextColor(hdc, RGB(255, 255, 255));
 		SetBkMode(hdc, TRANSPARENT);
 
-		TextOut(hdc, 10, 10, fps_text, lstrlen(fps_text));
+		TextOut(hdc, blit_x + 10, 10, fps_text, lstrlen(fps_text));
 #endif
 
 		//DwmFlush();

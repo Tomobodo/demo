@@ -1,4 +1,4 @@
-﻿#include "maths.hpp"
+﻿#include "common/maths.hpp"
 
 float fast_sin(float angle)
 {

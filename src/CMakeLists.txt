@@ -10,5 +10,10 @@ target_sources(
 		${PLATFORM_SRCS_DIR}/maths.cpp
 )
 
+target_include_directories(
+		${TARGET_NAME} PRIVATE
+		.
+)
+
 add_subdirectory(common)
 

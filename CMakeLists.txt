@@ -31,3 +31,15 @@ target_compile_definitions(${TARGET_NAME} PRIVATE
 		BUFFER_HEIGHT=${BUFFER_HEIGHT}
 		SHOW_FPS
 )
+
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_custom_command(
+			TARGET ${TARGET_NAME} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			-D "TARGET_PATH=$<TARGET_FILE:${TARGET_NAME}>"
+			-D "MAX_SIZE=4096"
+			-P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_size.cmake"
+			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+			COMMENT "Checking binary size"
+	)
+endif()
