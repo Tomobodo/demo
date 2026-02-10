@@ -7,7 +7,7 @@ target_compile_options(
 		/Oi
 		/Os
 		$<$<CONFIG:RelWithDebInfo>:/Od /Z7 /DDEBUG>
-		$<$<CONFIG:Release>:/EHa- /Zl /O2 /Gw /Gy>
+		$<$<CONFIG:Release>:/EHa-s-c- /Zl /O2 /Gw /Gy>
 )
 
 target_link_options(

@@ -5,6 +5,7 @@ option(USE_WASM_STRIP "Strip final wasm file" OFF)
 option(USE_CRINKLER "Compress final executable with CRINKLER" OFF)
 option(HOTRELOAD "Enabled hot reload" OFF)
 
+set(MAX_SIZE 4096 CACHE STRING "Maximum binary size in bytes")
 set(CRINKLER_PATH "Crinkler.exe" CACHE FILEPATH "Path to Crinkler executable")
 set(BUFFER_WIDTH 640 CACHE STRING "Buffer width")
 set(BUFFER_HEIGHT 480 CACHE STRING "Buffer height")
@@ -37,7 +38,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 			TARGET ${TARGET_NAME} POST_BUILD
 			COMMAND ${CMAKE_COMMAND}
 			-D "TARGET_PATH=$<TARGET_FILE:${TARGET_NAME}>"
-			-D "MAX_SIZE=4096"
+			-D "MAX_SIZE=${MAX_SIZE}"
 			-P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_size.cmake"
 			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 			COMMENT "Checking binary size"

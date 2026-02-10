@@ -1,8 +1,9 @@
-﻿set(CMAKE_SYSTEM_NAME Windows)
-
-if(NOT DEFINED MSVC_ARCH)
+﻿if(NOT DEFINED MSVC_ARCH)
     set(MSVC_ARCH x64)
 endif()
+
+set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_PROCESSOR ${MSVC_ARCH})
 
 if(NOT DEFINED _MSVC_ENV_IMPORTED)
     set(_MSVC_ENV_IMPORTED 1)
@@ -217,12 +218,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 add_compile_options(
         /nologo
-        /W4
         /Zc:__cplusplus
-        /EHs-c-
-)
-
-add_compile_options(
         $<$<CONFIG:Debug>:/Od>
         $<$<CONFIG:Debug>:/Z7>
         $<$<CONFIG:Release>:/O2>
