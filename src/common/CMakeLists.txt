@@ -1,5 +1,5 @@
 ﻿target_sources(
-		${TARGET_NAME} PRIVATE
+		${PROJECT_NAME} PRIVATE
 		maths.cpp
 		color.cpp
 		scene_a.cpp

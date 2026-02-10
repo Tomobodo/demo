@@ -1,7 +1,7 @@
-﻿add_executable(${TARGET_NAME} WIN32)
+﻿add_executable(${PROJECT_NAME} WIN32)
 
 target_compile_options(
-		${TARGET_NAME} PRIVATE
+		${PROJECT_NAME} PRIVATE
 		/std:c++latest
 		/GS-
 		/Oi
@@ -11,14 +11,14 @@ target_compile_options(
 )
 
 target_link_options(
-		${TARGET_NAME} PRIVATE
+		${PROJECT_NAME} PRIVATE
 		/ENTRY:entry
 		/NODEFAULTLIB
 )
 
 if (USE_CRINKLER)
 	target_link_options(
-			${TARGET_NAME} PRIVATE
+			${PROJECT_NAME} PRIVATE
 			/TINYHEADER
 			/TINYIMPORT
 			/COMPMODE:VERYSLOW
@@ -27,7 +27,7 @@ if (USE_CRINKLER)
 endif()
 
 target_link_libraries(
-		${TARGET_NAME} PRIVATE
+		${PROJECT_NAME} PRIVATE
 		kernel32.lib
 		user32.lib
 		gdi32.lib

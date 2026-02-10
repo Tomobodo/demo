@@ -1,5 +1,7 @@
 ﻿# Demo template
 
+![The demo running, just a basic bouncing ball](demo.gif)
+
 Just a demo template to test some things out.  
 It has hot reloading and a seek bar for smooth  
 workflow and debugging.

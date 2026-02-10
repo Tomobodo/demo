@@ -220,14 +220,17 @@ add_compile_options(
         /nologo
         /Zc:__cplusplus
         $<$<CONFIG:Debug>:/Od>
-        $<$<CONFIG:Debug>:/Z7>
+        $<$<CONFIG:Debug>:/Zi>
+        $<$<CONFIG:RelWithDebInfo>:/Od>
+        $<$<CONFIG:RelWithDebInfo>:/Zi>
         $<$<CONFIG:Release>:/O2>
         $<$<CONFIG:Release>:/DNDEBUG>
 )
 
 add_link_options(
         /nologo
-        $<$<CONFIG:Debug>:/DEBUG>
+        $<$<CONFIG:RelWithDebInfo>:/DEBUG:FULL>
+        $<$<CONFIG:Debug>:/DEBUG:FULL>
 )
 
 set(CMAKE_C_COMPILER_WORKS TRUE)

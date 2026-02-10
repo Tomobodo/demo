@@ -42,7 +42,7 @@
       "inherits": "base-windows",
       "binaryDir": "${sourceDir}/build/windows/Debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfos"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
     },
     {
@@ -59,7 +59,14 @@
       "inherits": "base-windows",
       "binaryDir": "${sourceDir}/build/windows/Release",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "Release_windows_crinkler",
+      "inherits": "Release_windows",
+      "binaryDir": "${sourceDir}/build/windows/Release_Compressed",
+      "cacheVariables": {
         "USE_CRINKLER": "ON"
       }
     }

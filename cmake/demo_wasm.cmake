@@ -4,12 +4,12 @@ set(MAX_MEMORY_PAGES 350)
 math(EXPR INITIAL_MEMORY "${INITIAL_MEMORY_PAGES} * 65536")
 math(EXPR MAX_MEMORY "${MAX_MEMORY_PAGES} * 65536")
 
-add_executable(${TARGET_NAME})
+add_executable(${PROJECT_NAME})
 
 set(OUTPUT_DIST_DIR "${CMAKE_CURRENT_BINARY_DIR}/dist")
 
 set_target_properties(
-		${TARGET_NAME} PROPERTIES
+		${PROJECT_NAME} PROPERTIES
 		OUTPUT_NAME "demo"
 		PREFIX ""
 		SUFFIX ".wasm"
@@ -17,7 +17,7 @@ set_target_properties(
 )
 
 target_compile_options(
-		${TARGET_NAME} PRIVATE
+		${PROJECT_NAME} PRIVATE
 		-ffreestanding
 		$<$<CONFIG:Release>: -O3 -Os>
 		$<$<CONFIG:Debug>: -g -O0>
@@ -27,7 +27,7 @@ target_compile_options(
 )
 
 target_link_options(
-		${TARGET_NAME} PRIVATE
+		${PROJECT_NAME} PRIVATE
 		-nostdlib
 		-Wl,--no-entry
 		-Wl,--export-all
@@ -49,8 +49,8 @@ if (USE_WASM_STRIP)
 
 	if (WASM_STRIP)
 		add_custom_command(
-				TARGET ${TARGET_NAME} POST_BUILD
-				COMMAND ${WASM_STRIP} $<TARGET_FILE:${TARGET_NAME}>
+				TARGET ${PROJECT_NAME} POST_BUILD
+				COMMAND ${WASM_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
 				COMMENT "Stripping Wasm binary..."
 		)
 	endif ()

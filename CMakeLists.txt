@@ -11,36 +11,20 @@ set(BUFFER_WIDTH 640 CACHE STRING "Buffer width")
 set(BUFFER_HEIGHT 480 CACHE STRING "Buffer height")
 
 project(
-		demo
-		VERSION 0.1.0
+		demo_template
+		VERSION 0.2.0
 		LANGUAGES CXX
 )
 
-set(TARGET_NAME demo)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 23)
 
-if (CMAKE_SYSTEM_NAME STREQUAL "wasm")
-	include(cmake/wasm.cmake)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "windows")
-	include(cmake/windows.cmake)
+include(cmake/demo.cmake)
+
+if (CMAKE_SYSTEM_NAME STREQUAL "windows")
+	include(cmake/gif_tool.cmake)
 endif ()
 
-add_subdirectory(src)
-
-target_compile_definitions(${TARGET_NAME} PRIVATE
-		FULLSCREEN
-		BUFFER_WIDTH=${BUFFER_WIDTH}
-		BUFFER_HEIGHT=${BUFFER_HEIGHT}
-		SHOW_FPS
+include_directories(
+		include
 )
-
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-	add_custom_command(
-			TARGET ${TARGET_NAME} POST_BUILD
-			COMMAND ${CMAKE_COMMAND}
-			-D "TARGET_PATH=$<TARGET_FILE:${TARGET_NAME}>"
-			-D "MAX_SIZE=${MAX_SIZE}"
-			-P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_size.cmake"
-			WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-			COMMENT "Checking binary size"
-	)
-endif()
