@@ -14,6 +14,7 @@
 #define BUFFER_HEIGHT 480
 #endif
 
+
 constexpr float ASPECT_RATIO = (float)BUFFER_WIDTH / (float)BUFFER_HEIGHT;
 
 extern "C" {

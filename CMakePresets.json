@@ -8,7 +8,7 @@
       "binaryDir": "${sourceDir}/build/wasm32/Debug",
       "cacheVariables": {
         "BUILD_WASM": "ON",
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm32.cmake",
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/clang-wasm32.cmake",
         "CMAKE_BUILD_TYPE": "Debug",
         "HOTRELOAD": "ON"
       }
@@ -19,7 +19,9 @@
       "displayName": "Win32 Debug",
       "binaryDir": "${sourceDir}/build/win32/Debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        "MSVC_ARCH": "x86",
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/msvc.cmake",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfos"
       },
       "vendor": {
         "jetbrains.com/clion": {
@@ -34,7 +36,7 @@
       "binaryDir": "${sourceDir}/build/wasm32/Release",
       "cacheVariables": {
         "BUILD_WASM": "ON",
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm32.cmake",
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/clang-wasm32.cmake",
         "CMAKE_BUILD_TYPE": "Release",
         "USE_WASM_STRIP": "ON"
       }
@@ -45,6 +47,8 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/win32/Release",
       "cacheVariables": {
+        "MSVC_ARCH": "x86",
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/msvc.cmake",
         "CMAKE_BUILD_TYPE": "Release",
         "USE_CRINKLER": "ON"
       },
@@ -58,19 +62,23 @@
   "buildPresets": [
     {
       "name": "Debug_wasm32",
-      "configurePreset": "Debug_wasm32"
+      "configurePreset": "Debug_wasm32",
+      "configuration": "Debug"
     },
     {
       "name": "Release_wasm32",
-      "configurePreset": "Release_wasm32"
+      "configurePreset": "Release_wasm32",
+      "configuration": "Release"
     },
     {
       "name": "Debug_win32",
-      "configurePreset": "Debug_win32"
+      "configurePreset": "Debug_win32",
+      "configuration": "Debug"
     },
     {
       "name": "Release_win32",
-      "configurePreset": "Release_win32"
+      "configurePreset": "Release_win32",
+      "configuration": "Release"
     }
   ]
 }
