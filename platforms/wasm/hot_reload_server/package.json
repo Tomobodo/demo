@@ -4,12 +4,15 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
-  "main": "notify.js",
+  "type": "module",
+  "main": "watcher.js",
   "scripts": {
-    "dev": "node notify.js"
+    "start": "node watcher.js",
+    "dev": "node watcher.js"
   },
   "dependencies": {
+    "chokidar": "^5.0.0",
+    "express": "^5.2.1",
     "ws": "^8.19.0"
   }
 }

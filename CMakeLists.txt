@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-option(BUILD_WASM "Build for wasm32 platform" OFF)
+option(BUILD_WASM "Build for wasm platform" OFF)
 option(USE_WASM_STRIP "Strip final wasm file" OFF)
 option(USE_CRINKLER "Compress final executable with CRINKLER" OFF)
 option(HOTRELOAD "Enabled hot reload" OFF)
@@ -20,7 +20,7 @@ set(TARGET_NAME demo)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "wasm")
 	include(cmake/wasm.cmake)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "windows")
 	include(cmake/windows.cmake)
 endif ()
 

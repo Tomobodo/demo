@@ -26,7 +26,7 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 	const auto draw_ball_y = abs(
 		(ball_incr + v_range) % (v_range * 2) - v_range) + BSIZE;
 
-	unsigned* ptr = frame_infos.pixel_buffer;
+	unsigned int * ptr = frame_infos.pixel_buffer;
 
 	constexpr float BACKGROUND_CIRCLE_RADIUS = 200.f;
 	const int y_offset = fast_sin(frame_infos.time) * BACKGROUND_CIRCLE_RADIUS;
@@ -55,7 +55,7 @@ void scene_a(void* data, const FrameInfos& frame_infos)
 
 			const int diff_x = draw_ball_x - x;
 			if (diff_x * diff_x + dy2 <= BSIZE_SQUARED)
-				*ptr++ = 0xFFFFFFFF;
+				*ptr++ = static_cast<Color>(0xFFFFFFFF);
 			else // Draw background
 			{
 				*ptr++ = BG_PALETTE[((x_cell ^ y_cell) & 1)];

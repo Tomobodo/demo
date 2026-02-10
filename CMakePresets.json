@@ -2,82 +2,87 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "Debug_wasm32",
-      "displayName": "Wasm Debug",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/wasm32/Debug",
+      "name": "base-platform",
+      "hidden": true,
+      "generator": "Ninja"
+    },
+    {
+      "name": "base-wasm",
+      "hidden": true,
+      "inherits": "base-platform",
       "cacheVariables": {
-        "BUILD_WASM": "ON",
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/clang-wasm32.cmake",
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm.cmake"
+      }
+    },
+    {
+      "name": "base-windows",
+      "hidden": true,
+      "inherits": "base-platform",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/windows.cmake",
+        "MSVC_ARCH": "x86"
+      },
+      "vendor": {
+        "jetbrains.com/clion": {
+          "toolchain": "Visual Studio x86"
+        }
+      }
+    },
+    {
+      "name": "Debug_wasm",
+      "inherits": "base-wasm",
+      "binaryDir": "${sourceDir}/build/wasm/Debug",
+      "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "HOTRELOAD": "ON"
       }
     },
     {
-      "name": "Debug_win32",
-      "generator": "Ninja",
-      "displayName": "Win32 Debug",
-      "binaryDir": "${sourceDir}/build/win32/Debug",
+      "name": "Debug_windows",
+      "inherits": "base-windows",
+      "binaryDir": "${sourceDir}/build/windows/Debug",
       "cacheVariables": {
-        "MSVC_ARCH": "x86",
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/msvc.cmake",
         "CMAKE_BUILD_TYPE": "RelWithDebInfos"
-      },
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "Visual Studio x86"
-        }
       }
     },
     {
-      "name": "Release_wasm32",
-      "displayName": "Wasm32 Release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/wasm32/Release",
+      "name": "Release_wasm",
+      "inherits": "base-wasm",
+      "binaryDir": "${sourceDir}/build/wasm/Release",
       "cacheVariables": {
-        "BUILD_WASM": "ON",
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/clang-wasm32.cmake",
         "CMAKE_BUILD_TYPE": "Release",
         "USE_WASM_STRIP": "ON"
       }
     },
     {
-      "name": "Release_win32",
-      "displayName": "Win32 Release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/win32/Release",
+      "name": "Release_windows",
+      "inherits": "base-windows",
+      "binaryDir": "${sourceDir}/build/windows/Release",
       "cacheVariables": {
-        "MSVC_ARCH": "x86",
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/msvc.cmake",
         "CMAKE_BUILD_TYPE": "Release",
         "USE_CRINKLER": "ON"
-      },
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "Visual Studio x86"
-        }
       }
     }
   ],
   "buildPresets": [
     {
-      "name": "Debug_wasm32",
-      "configurePreset": "Debug_wasm32",
+      "name": "Debug_wasm",
+      "configurePreset": "Debug_wasm",
       "configuration": "Debug"
     },
     {
-      "name": "Release_wasm32",
-      "configurePreset": "Release_wasm32",
+      "name": "Release_wasm",
+      "configurePreset": "Release_wasm",
       "configuration": "Release"
     },
     {
-      "name": "Debug_win32",
-      "configurePreset": "Debug_win32",
+      "name": "Debug_windows",
+      "configurePreset": "Debug_windows",
       "configuration": "Debug"
     },
     {
-      "name": "Release_win32",
-      "configurePreset": "Release_win32",
+      "name": "Release_windows",
+      "configurePreset": "Release_windows",
       "configuration": "Release"
     }
   ]

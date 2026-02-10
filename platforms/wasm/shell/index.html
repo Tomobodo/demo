@@ -1,62 +1,10 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Demo Wasm</title>
 
-    <style>
-        html, body {
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-        }
-
-        canvas {
-            position: relative;
-            height: 100%;
-            aspect-ratio: 1.3333333;
-
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .canvas-overlay {
-            position: absolute;
-            box-sizing: border-box;
-            z-index: 1000;
-            pointer-events: none;
-            height: 100%;
-            aspect-ratio: 1.333333;
-            padding: 10px 10px;
-
-            .fps {
-                font-size: 16px;
-                font-weight: bold;
-                text-transform: uppercase;
-                color: white;
-                font-family: sans-serif;
-                z-index: 1000;
-            }
-        }
-
-        .canvas-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: @BUFFER_WIDTH@px;
-            max-height: @BUFFER_HEIGHT@px;
-        }
-
-        main {
-            width: fit-content;
-        }
-
-        #seekbar {
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <main>
@@ -168,9 +116,14 @@
         async function init() {
             const ws = new WebSocket('ws://localhost:8081');
             ws.onmessage = (e) => {
-                if (e.data === 'reload') {
+                if (e.data === 'build') {
                     console.log('New wasm build, reloading...');
                     load();
+                }
+
+                if (e.data === 'shell') {
+                    console.log('New shell, refreshing...')
+                    window.location.reload()
                 }
             }
 

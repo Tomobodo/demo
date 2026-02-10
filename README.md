@@ -21,25 +21,25 @@ Make sure you have Crinkler and wasm-ld, wasm-strip, clang in your path.
 
 #### Build the demo
 
-First, check if the cmake/toolchains/wasm32.cmake match your system.  
+First, check if the cmake/toolchains/wasm.cmake match your system.  
 Some paths may differ.
 
 Then run :
 
 ```
-cmake --preset Debug_wasm32 
+cmake --preset Debug_wasm 
 
-cmake --build build/wasm32/Debug
+cmake --build build/wasm/Debug
 ```
 
-The index.html file is generated in build/wasm32/Debug/index.html
+The index.html file is generated in build/wasm/Debug/index.html
 
 #### Enable hot reloading
 
 Build the node server to notify index.html a new wasm build is available :
 
 ```shell
-cd templates/wasm32/hot_reload_server
+cd platforms/wasm/hot_reload_server
 npm install
 npm run dev
 ```
@@ -48,5 +48,5 @@ then launch some file watcher to watch the source files and trigger a build.
 I use CLion's file watcher plugin, you can also use watchexec :
 
 ```shell
-watchexec -e cpp,hpp -- "cmake --build --preset Debug_wasm32"    
+watchexec -e cpp,hpp -- "cmake --build --preset Debug_wasm"    
 ```
