@@ -5,6 +5,8 @@
     <title>Demo Wasm</title>
 
     <link rel="stylesheet" href="style.css" />
+
+    @SHELL_HR_SCRIPT@
 </head>
 <body>
     <main>
@@ -54,7 +56,7 @@
         }
 
         async function load() {
-            const response = await fetch('demo.wasm?' + Date.now());
+            const response = await fetch('@TARGET_NAME@.wasm?' + Date.now());
             const bytes = await response.arrayBuffer();
             const {instance} = await WebAssembly.instantiate(bytes, {
                 env: {
@@ -114,19 +116,6 @@
             }
         }
         async function init() {
-            const ws = new WebSocket('ws://localhost:8081');
-            ws.onmessage = (e) => {
-                if (e.data === 'build') {
-                    console.log('New wasm build, reloading...');
-                    load();
-                }
-
-                if (e.data === 'shell') {
-                    console.log('New shell, refreshing...')
-                    window.location.reload()
-                }
-            }
-
             await load();
 
             canvas = document.getElementById('canvas');

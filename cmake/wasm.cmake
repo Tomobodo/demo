@@ -56,14 +56,11 @@ if (USE_WASM_STRIP)
 	endif ()
 endif ()
 
-if (HOTRELOAD)
-	add_custom_command(
-			TARGET ${TARGET_NAME} POST_BUILD
-			COMMAND curl -s http://localhost:8082/ --output /dev/null --max-time 1 || cmake -E true
-	)
-endif ()
-
 # Generate shell
+
+if(HOTRELOAD)
+	set(SHELL_HR_SCRIPT "<script src='scripts/hot-reload.js'></script>")
+endif ()
 
 set(SHELL_SRC "${CMAKE_CURRENT_SOURCE_DIR}/platforms/wasm/shell")
 set(SHELL_DST "${OUTPUT_DIST_DIR}")
@@ -91,8 +88,3 @@ foreach(FILE_PATH IN LISTS ALL_FILES)
 		configure_file("${SRC_FILE}" "${DST_FILE}" COPYONLY)
 	endif()
 endforeach()
-
-#configure_file(
-#		${CMAKE_CURRENT_SOURCE_DIR}/platforms/wasm/shell/index.html
-#		${OUTPUT_DIST_DIR}/index.html
-#)
