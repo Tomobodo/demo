@@ -1,4 +1,4 @@
-﻿set(CMAKE_SYSTEM_NAME WASM)
+﻿set(CMAKE_SYSTEM_NAME wasm)
 set(CMAKE_SYSTEM_PROCESSOR wasm32)
 set(CMAKE_CXX_COMPILER_TARGET wasm32-unknown-unknown)
 

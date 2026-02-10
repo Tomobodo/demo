@@ -18,10 +18,10 @@ project(
 
 set(TARGET_NAME demo)
 
-if (BUILD_WASM)
-	include(cmake/wasm32.cmake)
-else ()
-	include(cmake/win32.cmake)
+if (CMAKE_SYSTEM_NAME STREQUAL "wasm")
+	include(cmake/wasm.cmake)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	include(cmake/windows.cmake)
 endif ()
 
 add_subdirectory(src)

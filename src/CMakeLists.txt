@@ -1,13 +1,7 @@
-﻿if (BUILD_WASM)
-	set (PLATFORM_SRCS_DIR wasm32)
-else ()
-	set (PLATFORM_SRCS_DIR win32)
-endif ()
-
-target_sources(
+﻿target_sources(
 		${TARGET_NAME} PRIVATE
-		${PLATFORM_SRCS_DIR}/main.cpp
-		${PLATFORM_SRCS_DIR}/maths.cpp
+		${CMAKE_SYSTEM_NAME}/main.cpp
+		${CMAKE_SYSTEM_NAME}/maths.cpp
 )
 
 target_include_directories(
@@ -16,4 +10,3 @@ target_include_directories(
 )
 
 add_subdirectory(common)
-

@@ -1,5 +1,4 @@
-﻿set(TARGET_NAME demo_wasm)
-set(INITIAL_MEMORY_PAGES 350)
+﻿set(INITIAL_MEMORY_PAGES 350)
 set(MAX_MEMORY_PAGES 350)
 
 math(EXPR INITIAL_MEMORY "${INITIAL_MEMORY_PAGES} * 65536")
@@ -26,7 +25,6 @@ target_compile_options(
 
 target_link_options(
 		${TARGET_NAME} PRIVATE
-		-flto
 		-nostdlib
 		-Wl,--no-entry
 		-Wl,--export-all
@@ -35,7 +33,12 @@ target_link_options(
 		-Wl,--import-memory
 		-Wl,--initial-memory=${INITIAL_MEMORY}
 		-Wl,--max-memory=${MAX_MEMORY}
-		#-Wl,--initial-memory=1310720
+		-Wl,--threads=24
+		# disabling every possible link time optimisations in debug
+		# for faster hotreload
+		$<$<CONFIG:Release>: -flto>
+		$<$<CONFIG:Debug>: -Wl,--no-merge-data-segments>
+		$<$<CONFIG:Debug>: -Wl,--no-gc-sections>
 )
 
 configure_file(
