@@ -19,12 +19,12 @@ project(
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 23)
 
-include(cmake/demo.cmake)
-
-if (CMAKE_SYSTEM_NAME STREQUAL "windows")
-	include(cmake/gif_tool.cmake)
-endif ()
-
 include_directories(
 		include
 )
+
+include(cmake/demo/demo.cmake)
+
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "wasm")
+include(cmake/gif_tool.cmake)
+endif()

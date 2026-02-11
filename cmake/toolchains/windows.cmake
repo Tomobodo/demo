@@ -4,6 +4,7 @@ endif()
 
 set(CMAKE_SYSTEM_NAME windows)
 set(CMAKE_SYSTEM_PROCESSOR ${MSVC_ARCH})
+set(CMAKE_NINJA_FORCE_RESPONSE_FILE 1 CACHE INTERNAL "")
 
 if(NOT DEFINED _MSVC_ENV_IMPORTED)
     set(_MSVC_ENV_IMPORTED 1)
@@ -140,34 +141,6 @@ if(NOT DEFINED _MSVC_ENV_IMPORTED)
     if(EXISTS "${_MT_EXE}")
         set(CMAKE_MT "${_MT_EXE}" CACHE FILEPATH "" FORCE)
     endif()
-
-    # SDK Includes list
-    set(_SDK_INCLUDES
-            "${_KITS_BASE}/Include/${_SDK_VER}/ucrt"
-            "${_KITS_BASE}/Include/${_SDK_VER}/um"
-            "${_KITS_BASE}/Include/${_SDK_VER}/shared"
-            "${_KITS_BASE}/Include/${_SDK_VER}/winrt"
-            "${_KITS_BASE}/Include/${_SDK_VER}/cppwinrt"
-    )
-
-    foreach(_p IN LISTS _SDK_INCLUDES)
-        if(EXISTS "${_p}")
-            string(APPEND _INCLUDE ";${_p}")
-        endif()
-    endforeach()
-
-    # SDK libraries list
-    set(_SDK_LIBPATHS
-            "${_KITS_BASE}/Lib/${_SDK_VER}/um/${MSVC_ARCH}"
-            "${_KITS_BASE}/Lib/${_SDK_VER}/ucrt/${MSVC_ARCH}"
-            "${_MSVC_TOOLS_DIR}/lib/${MSVC_ARCH}"
-    )
-
-    foreach(_p IN LISTS _SDK_LIBPATHS)
-        if(EXISTS "${_p}")
-            string(APPEND _LIBPATH ";${_p}")
-        endif()
-    endforeach()
 
     if(NOT _PATH STREQUAL "")
         set(ENV{PATH} "${_PATH}")

@@ -6,9 +6,10 @@
 
 add_executable(${PROJECT_NAME})
 
-add_subdirectory(src/tool_gif ${PROJECT_NAME})
-add_subdirectory(src/common ${PROJECT_NAME}/common)
-add_subdirectory(src/windows ${PROJECT_NAME}/windows)
+add_subdirectory(src/tool_gif)
+add_subdirectory(src/common)
+add_subdirectory(src/demo)
+add_subdirectory(platforms/${CMAKE_SYSTEM_NAME}/src/common)
 
 target_compile_options(
         ${PROJECT_NAME} PRIVATE
@@ -21,9 +22,4 @@ target_link_options(
         ${PROJECT_NAME} PRIVATE
         /nologo
         $<$<CONFIG:Debug>:/DEBUG>
-)
-
-target_include_directories(
-        ${PROJECT_NAME} PRIVATE
-        src
 )

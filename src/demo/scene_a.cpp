@@ -1,7 +1,8 @@
-﻿#include "scene_a.hpp"
-#include "maths.hpp"
-#include "frame_infos.h"
-#include "color.hpp"
+﻿#include "../../include/demo/scene_a.hpp"
+
+#include "common/maths.hpp"
+#include "common/frame_infos.hpp"
+#include "common/color.hpp"
 
 constexpr auto PI = 3.14159265359f;
 constexpr auto HPI = PI / 2.0f;

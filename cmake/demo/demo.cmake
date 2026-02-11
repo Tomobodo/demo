@@ -9,13 +9,24 @@ project(
         LANGUAGES CXX
 )
 
-if (CMAKE_SYSTEM_NAME STREQUAL "wasm")
-    include(cmake/demo_wasm.cmake)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "windows")
-    include(cmake/demo_windows.cmake)
+set(PLATFORM_CMAKE_PATH ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}/platforms/${CMAKE_SYSTEM_NAME}.cmake)
+
+if (NOT EXISTS ${PLATFORM_CMAKE_PATH})
+    return()
 endif ()
 
-add_subdirectory(src)
+add_executable(${PROJECT_NAME})
+
+include(${PLATFORM_CMAKE_PATH})
+
+add_subdirectory(src/demo ${PROJECT_NAME})
+add_subdirectory(src/common ${PROJECT_NAME}/common)
+add_subdirectory(platforms/${CMAKE_SYSTEM_NAME}/src/common ${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}/common)
+
+target_sources(
+        ${PROJECT_NAME} PRIVATE
+        ${PROJECT_SOURCE_DIR}/platforms/${CMAKE_SYSTEM_NAME}/src/demo/entry.cpp
+)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
         FULLSCREEN
@@ -24,13 +35,13 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         SHOW_FPS
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
+if (USE_CRINKLER)
     add_custom_command(
             TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND}
             -D "TARGET_PATH=$<TARGET_FILE:${PROJECT_NAME}>"
             -D "MAX_SIZE=${MAX_SIZE}"
-            -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_size.cmake"
+            -P "${PROJECT_SOURCE_DIR}/cmake/check_size.cmake"
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Checking binary size"
     )

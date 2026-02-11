@@ -1,13 +1,15 @@
-﻿#include<iostream>
+﻿#define MSF_GIF_IMPL
+
+#include<iostream>
 #include<print>
 #include<string>
 
-#define MSF_GIF_IMPL
-#include "msf_gif.h"
+#include "common/frame_infos.hpp"
+#include "common/color.hpp"
 
-#include "../common/frame_infos.h"
-#include "../common/scene_a.hpp"
-#include "../common/color.hpp"
+#include "demo/scene_a.hpp"
+
+#include "vendor/msf_gif.h"
 
 int main(const int argc, const char** argv)
 {

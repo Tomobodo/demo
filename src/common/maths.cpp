@@ -1,4 +1,4 @@
-﻿#include "maths.hpp"
+﻿#include "common/maths.hpp"
 
 float lerp(float a, float b, float t)
 {

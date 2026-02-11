@@ -4,13 +4,10 @@ set(MAX_MEMORY_PAGES 350)
 math(EXPR INITIAL_MEMORY "${INITIAL_MEMORY_PAGES} * 65536")
 math(EXPR MAX_MEMORY "${MAX_MEMORY_PAGES} * 65536")
 
-add_executable(${PROJECT_NAME})
-
-set(OUTPUT_DIST_DIR "${CMAKE_CURRENT_BINARY_DIR}/dist")
+set(OUTPUT_DIST_DIR "${PROJECT_BINARY_DIR}/dist")
 
 set_target_properties(
 		${PROJECT_NAME} PROPERTIES
-		OUTPUT_NAME "demo"
 		PREFIX ""
 		SUFFIX ".wasm"
 		RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIST_DIR}
@@ -62,7 +59,7 @@ if(HOTRELOAD)
 	set(SHELL_HR_SCRIPT "<script src='scripts/hot-reload.js'></script>")
 endif ()
 
-set(SHELL_SRC "${CMAKE_CURRENT_SOURCE_DIR}/platforms/wasm/shell")
+set(SHELL_SRC "${PROJECT_SOURCE_DIR}/platforms/wasm/shell")
 set(SHELL_DST "${OUTPUT_DIST_DIR}")
 
 file(GLOB_RECURSE ALL_FILES RELATIVE "${SHELL_SRC}" "${SHELL_SRC}/*")

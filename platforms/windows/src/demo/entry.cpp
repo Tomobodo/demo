@@ -2,9 +2,9 @@
 #include <windows.h>
 #include <dwmapi.h>
 
-#include "common/scene.hpp"
-#include "common/scene_a.hpp"
-#include "common/frame_infos.h"
+#include "demo/scene.hpp"
+#include "demo/scene_a.hpp"
+#include "common/frame_infos.hpp"
 
 #ifndef BUFFER_WIDTH
 #define BUFFER_WIDTH 640

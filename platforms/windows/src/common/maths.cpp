@@ -1,6 +1,4 @@
-﻿#include "common/maths.hpp"
-
-float fast_sin(float angle)
+﻿float fast_sin(float angle)
 {
 	float result;
 	__asm {

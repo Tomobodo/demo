@@ -1,4 +1,7 @@
-﻿add_executable(${PROJECT_NAME} WIN32)
+﻿set_target_properties(
+		${PROJECT_NAME} PROPERTIES
+		WIN32_EXECUTABLE TRUE
+)
 
 target_compile_options(
 		${PROJECT_NAME} PRIVATE
