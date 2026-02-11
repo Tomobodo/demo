@@ -1,7 +1,11 @@
-﻿option(BUILD_WASM "Build for wasm platform" OFF)
-option(USE_WASM_STRIP "Strip final wasm file" OFF)
+﻿option(USE_WASM_STRIP "Strip final wasm file" OFF)
 option(USE_CRINKLER "Compress final executable with CRINKLER" OFF)
 option(HOTRELOAD "Enabled hot reload" OFF)
+
+set(MAX_SIZE 4096 CACHE STRING "Maximum binary size in bytes")
+
+set(BUFFER_WIDTH 640 CACHE STRING "Buffer width")
+set(BUFFER_HEIGHT 480 CACHE STRING "Buffer height")
 
 project(
         demo
@@ -21,7 +25,6 @@ include(${PLATFORM_CMAKE_PATH})
 
 add_subdirectory(src/demo ${PROJECT_NAME})
 add_subdirectory(src/common ${PROJECT_NAME}/common)
-add_subdirectory(platforms/${CMAKE_SYSTEM_NAME}/src/common ${PROJECT_NAME}/${CMAKE_SYSTEM_NAME}/common)
 
 target_sources(
         ${PROJECT_NAME} PRIVATE

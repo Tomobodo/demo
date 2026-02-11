@@ -1,10 +1,10 @@
-﻿if(NOT DEFINED MSVC_ARCH)
-    set(MSVC_ARCH x64)
-endif()
-
-set(CMAKE_SYSTEM_NAME windows)
+﻿set(CMAKE_SYSTEM_NAME windows)
 set(CMAKE_SYSTEM_PROCESSOR ${MSVC_ARCH})
 set(CMAKE_NINJA_FORCE_RESPONSE_FILE 1 CACHE INTERNAL "")
+
+if(NOT DEFINED MSVC_ARCH)
+    set(MSVC_ARCH x64)
+endif()
 
 if(NOT DEFINED _MSVC_ENV_IMPORTED)
     set(_MSVC_ENV_IMPORTED 1)
@@ -194,8 +194,8 @@ add_compile_options(
         /Zc:__cplusplus
         $<$<CONFIG:Debug>:/Od>
         $<$<CONFIG:Debug>:/Zi>
-        $<$<CONFIG:RelWithDebInfo>:/Od>
-        $<$<CONFIG:RelWithDebInfo>:/Zi>
+        $<$<CONFIG:RelWithDebInfo>:/Od> # MSVC is super annoying in debug when working with no crt, forcing some flags we can't remove so
+        $<$<CONFIG:RelWithDebInfo>:/Zi> # we prefer using RelWithDebInfo with some debug flags instead
         $<$<CONFIG:Release>:/O2>
         $<$<CONFIG:Release>:/DNDEBUG>
 )

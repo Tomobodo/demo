@@ -9,7 +9,6 @@ add_executable(${PROJECT_NAME})
 add_subdirectory(src/tool_gif)
 add_subdirectory(src/common)
 add_subdirectory(src/demo)
-add_subdirectory(platforms/${CMAKE_SYSTEM_NAME}/src/common)
 
 target_compile_options(
         ${PROJECT_NAME} PRIVATE
