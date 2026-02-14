@@ -29,7 +29,7 @@ add_executable(${TARGET})
 
 target_compile_definitions(
         ${TARGET} PRIVATE
-        FULLSCREEN
+        #FULLSCREEN
         PLATFORM_${CMAKE_SYSTEM_NAME}
         $<$<BOOL:${HOTRELOAD}>:HOTRELOAD>
 )

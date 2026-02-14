@@ -2,6 +2,8 @@
 
 #include "demo/demo.hpp"
 #include "demo/scene_a.hpp"
+#include "demo/scene_b.hpp"
+#include "demo/rotoz.hpp"
 
 #include "engine/drawable.hpp"
 
