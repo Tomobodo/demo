@@ -1,5 +1,5 @@
-﻿#include "common/color.hpp"
-#include "common/maths.hpp"
+﻿#include "engine/color.hpp"
+#include "engine/maths.hpp"
 
 Color lerp_color(Color ca, Color cb, float t)
 {

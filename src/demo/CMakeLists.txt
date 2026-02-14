@@ -1,4 +1,5 @@
 ﻿target_sources(
-		${PROJECT_NAME} PRIVATE
-		scene_a.cpp
+        ${TARGET} PRIVATE
+        scene_a.cpp
+        demo.cpp
 )

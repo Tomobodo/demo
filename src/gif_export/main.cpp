@@ -4,8 +4,8 @@
 #include<print>
 #include<string>
 
-#include "common/frame_infos.hpp"
-#include "common/color.hpp"
+#include "engine/frame_infos.hpp"
+#include "engine/color.hpp"
 
 #include "demo/scene_a.hpp"
 
@@ -15,18 +15,18 @@ int main(const int argc, const char** argv)
 {
    if (argc < 7)
    {
-      std::println(std::cerr, "Usage: gif_teol WIDTH HEIGHT FRAMES_COUNT FRAME_RATE QUALITY SCALE");
+      std::println(std::cerr, "Usage: gif_export WIDTH HEIGHT FRAMES_COUNT FRAME_RATE QUALITY SCALE");
       return 1;
    }
 
-   const int buffer_width = std::stoi(argv[1]);
-   const int buffer_height = std::stoi(argv[2]);
+   const unsigned int buffer_width = std::stoi(argv[1]);
+   const unsigned int buffer_height = std::stoi(argv[2]);
    const int frames_count = std::stoi(argv[3]);
    const int framerate = std::stoi(argv[4]);
    const int quality = std::stoi(argv[5]);
    const int scale = std::stoi(argv[6]);
 
-   const int gif_buffer_width = buffer_width / scale ;
+   const int gif_buffer_width = buffer_width / scale;
    const int gif_buffer_height = buffer_height / scale;
 
    const auto fps = static_cast<float>(framerate);
@@ -40,25 +40,30 @@ int main(const int argc, const char** argv)
 
    const auto demo_pixels = new unsigned int[buffer_width * buffer_height];
 
+   PixelBuffer demo_buf = {
+      .width = buffer_width,
+      .height = buffer_height,
+      .pixels = demo_pixels
+   };
+
    const auto total_pixels = buffer_width * buffer_height;
    const auto total_gif_pixels = gif_buffer_width * gif_buffer_height;
+   float time = 0;
+
+   const Rect rect = {
+      .x = 0,
+      .y = 0,
+      .w = buffer_width,
+      .h = buffer_height
+   };
 
    for (unsigned int i = 0; i < frames_count; ++i)
    {
       auto pixels = new unsigned char[total_gif_pixels * 4];
 
-      const FrameInfos infos = {
-         .frame = i,
-         .delta_time = delta_time,
-         .time = i * delta_time,
-         .fps = fps,
-         .smooth_fps = fps,
-         .pixel_buffer = demo_pixels,
-         .pixel_buffer_width = static_cast<unsigned int>(buffer_width),
-         .pixel_buffer_height = static_cast<unsigned int>(buffer_height)
-      };
+      scene_a(time, rect, demo_buf);
 
-      scene_a(nullptr, infos);
+      time += delta_time;
 
       for (int y = 0; y < gif_buffer_height; ++y)
       {

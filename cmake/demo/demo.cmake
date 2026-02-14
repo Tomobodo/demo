@@ -1,6 +1,7 @@
 ﻿option(USE_WASM_STRIP "Strip final wasm file" OFF)
 option(USE_CRINKLER "Compress final executable with CRINKLER" OFF)
-option(HOTRELOAD "Enabled hot reload" OFF)
+option(HOTRELOAD "Enable hot reload" OFF)
+option(SHOW_FPS "Enable fps counter" OFF)
 
 set(MAX_SIZE 4096 CACHE STRING "Maximum binary size in bytes")
 
@@ -13,39 +14,52 @@ project(
         LANGUAGES CXX
 )
 
-set(PLATFORM_CMAKE_PATH ${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}/platforms/${CMAKE_SYSTEM_NAME}.cmake)
+set(TARGET_EXE ${PROJECT_NAME})
+set(TARGET_LIB ${PROJECT_NAME}_lib)
+
+set(TARGET ${TARGET_EXE})
+
+set(PLATFORM_CMAKE_PATH ${PROJECT_SOURCE_DIR}/cmake/${TARGET}/platforms/${CMAKE_SYSTEM_NAME}.cmake)
 
 if (NOT EXISTS ${PLATFORM_CMAKE_PATH})
     return()
 endif ()
 
-add_executable(${PROJECT_NAME})
+add_executable(${TARGET})
+
+target_compile_definitions(
+        ${TARGET} PRIVATE
+        FULLSCREEN
+        PLATFORM_${CMAKE_SYSTEM_NAME}
+        $<$<BOOL:${HOTRELOAD}>:HOTRELOAD>
+)
+
+# Before this include, the target is the executable shell, platform specific
 
 include(${PLATFORM_CMAKE_PATH})
 
-add_subdirectory(src/demo ${PROJECT_NAME})
-add_subdirectory(src/common ${PROJECT_NAME}/common)
+# From here, the target is the demo itseld, either a separate library or in the executable
 
-target_sources(
-        ${PROJECT_NAME} PRIVATE
-        ${PROJECT_SOURCE_DIR}/platforms/${CMAKE_SYSTEM_NAME}/src/demo/entry.cpp
-)
+add_subdirectory(src/demo ${TARGET})
+add_subdirectory(src/engine ${TARGET}/engine)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-        FULLSCREEN
+target_compile_definitions(
+        ${TARGET} PRIVATE
         BUFFER_WIDTH=${BUFFER_WIDTH}
         BUFFER_HEIGHT=${BUFFER_HEIGHT}
-        SHOW_FPS
+        PLATFORM_${CMAKE_SYSTEM_NAME}
+        $<$<BOOL:${HOTRELOAD}>:HOTRELOAD>
+        $<$<BOOL:${SHOW_FPS}>:SHOW_FPS>
 )
 
 if (USE_CRINKLER)
     add_custom_command(
-            TARGET ${PROJECT_NAME} POST_BUILD
+            TARGET ${TARGET} POST_BUILD
             COMMAND ${CMAKE_COMMAND}
-            -D "TARGET_PATH=$<TARGET_FILE:${PROJECT_NAME}>"
+            -D "TARGET_PATH=$<TARGET_FILE:${TARGET}>"
             -D "MAX_SIZE=${MAX_SIZE}"
             -P "${PROJECT_SOURCE_DIR}/cmake/check_size.cmake"
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             COMMENT "Checking binary size"
     )
-endif()
+endif ()

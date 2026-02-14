@@ -2,7 +2,7 @@
 ws.onmessage = (e) => {
     if (e.data === 'build') {
         console.log('New wasm build, reloading...');
-        load();
+        load_wasm();
     }
 
     if (e.data === 'shell') {
