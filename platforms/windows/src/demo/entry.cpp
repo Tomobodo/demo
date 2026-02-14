@@ -178,11 +178,13 @@ void entry()
 
 	while (loop)
 	{
+#ifdef HOTRELOAD
 		if (need_to_reload_lib)
 		{
 			load_lib();
 			init();
 		}
+#endif
 
 		QueryPerformanceCounter(&t_end);
 

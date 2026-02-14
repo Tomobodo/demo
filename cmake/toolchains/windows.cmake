@@ -2,17 +2,17 @@
 set(CMAKE_SYSTEM_PROCESSOR ${MSVC_ARCH})
 set(CMAKE_NINJA_FORCE_RESPONSE_FILE 1 CACHE INTERNAL "")
 
-if(NOT DEFINED MSVC_ARCH)
+if (NOT DEFINED MSVC_ARCH)
     set(MSVC_ARCH x64)
-endif()
+endif ()
 
-if(NOT DEFINED _MSVC_ENV_IMPORTED)
+if (NOT DEFINED _MSVC_ENV_IMPORTED)
     set(_MSVC_ENV_IMPORTED 1)
 
     set(_VSWHERE "C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe")
-    if(NOT EXISTS "${_VSWHERE}")
+    if (NOT EXISTS "${_VSWHERE}")
         message(FATAL_ERROR "vswhere not found: ${_VSWHERE}")
-    endif()
+    endif ()
 
     execute_process(
             COMMAND "${_VSWHERE}" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
@@ -21,22 +21,22 @@ if(NOT DEFINED _MSVC_ENV_IMPORTED)
             RESULT_VARIABLE _VSWHERE_RC
     )
 
-    if(NOT _VSWHERE_RC EQUAL 0 OR _VS_INSTALL STREQUAL "")
+    if (NOT _VSWHERE_RC EQUAL 0 OR _VS_INSTALL STREQUAL "")
         message(FATAL_ERROR "No Visual Studio install found")
-    endif()
+    endif ()
 
     file(TO_CMAKE_PATH "${_VS_INSTALL}" _VS_INSTALL)
 
     # MSVC
     file(GLOB _MSVC_VERSIONS "${_VS_INSTALL}/VC/Tools/MSVC/*")
-    if(_MSVC_VERSIONS STREQUAL "")
+    if (_MSVC_VERSIONS STREQUAL "")
         message(FATAL_ERROR "No MSVC version found in ${_VS_INSTALL}/VC/Tools/MSVC")
-    endif()
+    endif ()
 
     list(SORT _MSVC_VERSIONS COMPARE NATURAL)
     list(GET _MSVC_VERSIONS -1 _MSVC_TOOLS_DIR)
 
-    set(_CL_EXE   "${_MSVC_TOOLS_DIR}/bin/Host${MSVC_ARCH}/${MSVC_ARCH}/cl.exe")
+    set(_CL_EXE "${_MSVC_TOOLS_DIR}/bin/Host${MSVC_ARCH}/${MSVC_ARCH}/cl.exe")
 
     if (USE_CRINKLER)
         find_program(CRINKLER_PATH
@@ -45,23 +45,23 @@ if(NOT DEFINED _MSVC_ENV_IMPORTED)
                 NO_CACHE
         )
         set(_LINK_EXE ${CRINKLER_PATH})
-    else()
+    else ()
         set(_LINK_EXE "${_MSVC_TOOLS_DIR}/bin/Host${MSVC_ARCH}/${MSVC_ARCH}/link.exe")
-        if(NOT EXISTS "${_LINK_EXE}")
+        if (NOT EXISTS "${_LINK_EXE}")
             message(FATAL_ERROR "link.exe not found: ${_LINK_EXE}")
-        endif()
-    endif()
+        endif ()
+    endif ()
 
     set(_ARCH_ARG "-arch=${MSVC_ARCH}")
 
-    if(NOT EXISTS "${_CL_EXE}")
+    if (NOT EXISTS "${_CL_EXE}")
         message(FATAL_ERROR "cl.exe not found: ${_CL_EXE}")
-    endif()
+    endif ()
 
     set(_VSDEVCMD "${_VS_INSTALL}/Common7/Tools/VsDevCmd.bat")
-    if(NOT EXISTS "${_VSDEVCMD}")
+    if (NOT EXISTS "${_VSDEVCMD}")
         message(FATAL_ERROR "VsDevCmd.bat not found: ${_VSDEVCMD}")
-    endif()
+    endif ()
 
     # output vcvars in a file so it can works from both cmd or msys64 zsh
     set(_ENV_TXT "${CMAKE_BINARY_DIR}/_msvc_env.txt")
@@ -79,19 +79,19 @@ if(NOT DEFINED _MSVC_ENV_IMPORTED)
             RESULT_VARIABLE _RC
     )
 
-    if(NOT _RC EQUAL 0)
+    if (NOT _RC EQUAL 0)
         message(FATAL_ERROR "failed executing VsDevCmd: ${_VSDEVCMD}")
-    endif()
+    endif ()
 
-    if(NOT EXISTS "${_ENV_TXT}")
+    if (NOT EXISTS "${_ENV_TXT}")
         message(FATAL_ERROR "env file not générated: ${_ENV_TXT}")
-    endif()
+    endif ()
 
     # fetch env from generated file instead of stdout
     file(READ "${_ENV_TXT}" _ENV_DUMP)
 
     string(REPLACE "\r\n" "\n" _ENV_DUMP "${_ENV_DUMP}")
-    string(REPLACE "\r"   "\n" _ENV_DUMP "${_ENV_DUMP}")
+    string(REPLACE "\r" "\n" _ENV_DUMP "${_ENV_DUMP}")
     string(REPLACE "\n" ";" _ENV_LINES "${_ENV_DUMP}")
 
     set(_INCLUDE "")
@@ -99,28 +99,28 @@ if(NOT DEFINED _MSVC_ENV_IMPORTED)
     set(_LIBPATH "")
     set(_PATH "")
 
-    foreach(_LINE IN LISTS _ENV_LINES)
-        if(_LINE MATCHES "^INCLUDE=(.*)$")
+    foreach (_LINE IN LISTS _ENV_LINES)
+        if (_LINE MATCHES "^INCLUDE=(.*)$")
             set(_INCLUDE "${CMAKE_MATCH_1}")
-        elseif(_LINE MATCHES "^LIB=(.*)$")
+        elseif (_LINE MATCHES "^LIB=(.*)$")
             set(_LIB "${CMAKE_MATCH_1}")
-        elseif(_LINE MATCHES "^LIBPATH=(.*)$")
+        elseif (_LINE MATCHES "^LIBPATH=(.*)$")
             set(_LIBPATH "${CMAKE_MATCH_1}")
-        elseif(_LINE MATCHES "^PATH=(.*)$")
+        elseif (_LINE MATCHES "^PATH=(.*)$")
             set(_PATH "${CMAKE_MATCH_1}")
-        endif()
-    endforeach()
+        endif ()
+    endforeach ()
 
-    if(_INCLUDE STREQUAL "")
+    if (_INCLUDE STREQUAL "")
         message(FATAL_ERROR "INCLUDE still empty after VsDevCmd.")
-    endif()
+    endif ()
 
     # Add includes and lib directories
     set(_KITS_BASE "C:/Program Files (x86)/Windows Kits/10")
 
-    if(NOT EXISTS "${_KITS_BASE}/Include")
+    if (NOT EXISTS "${_KITS_BASE}/Include")
         message(FATAL_ERROR "Windows SDK not found (Windows Kits 10).")
-    endif()
+    endif ()
 
     # Find latest Windows SDK version
     file(GLOB _SDK_INCLUDE_VERSIONS "${_KITS_BASE}/Include/*")
@@ -132,48 +132,76 @@ if(NOT DEFINED _MSVC_ENV_IMPORTED)
     set(_RC_EXE "${_SDK_BIN_DIR}/rc.exe")
     set(_MT_EXE "${_SDK_BIN_DIR}/mt.exe")
 
-    if(NOT EXISTS "${_RC_EXE}")
+    if (NOT EXISTS "${_RC_EXE}")
         message(FATAL_ERROR "rc.exe not found: ${_RC_EXE}")
-    endif()
+    endif ()
 
     set(CMAKE_RC_COMPILER "${_RC_EXE}" CACHE FILEPATH "" FORCE)
 
-    if(EXISTS "${_MT_EXE}")
+    if (EXISTS "${_MT_EXE}")
         set(CMAKE_MT "${_MT_EXE}" CACHE FILEPATH "" FORCE)
-    endif()
+    endif ()
 
-    if(NOT _PATH STREQUAL "")
+    if (NOT _PATH STREQUAL "")
         set(ENV{PATH} "${_PATH}")
-    endif()
+    endif ()
+
+    # SDK Includes list
+    set(_SDK_INCLUDES
+            "${_KITS_BASE}/Include/${_SDK_VER}/ucrt"
+            "${_KITS_BASE}/Include/${_SDK_VER}/um"
+            "${_KITS_BASE}/Include/${_SDK_VER}/shared"
+            "${_KITS_BASE}/Include/${_SDK_VER}/winrt"
+            "${_KITS_BASE}/Include/${_SDK_VER}/cppwinrt"
+    )
+
+    foreach (_p IN LISTS _SDK_INCLUDES)
+        if (EXISTS "${_p}")
+            string(APPEND _INCLUDE ";${_p}")
+        endif ()
+    endforeach ()
+
+    # SDK libraries list
+    set(_SDK_LIBPATHS
+            "${_KITS_BASE}/Lib/${_SDK_VER}/um/${MSVC_ARCH}"
+            "${_KITS_BASE}/Lib/${_SDK_VER}/ucrt/${MSVC_ARCH}"
+            "${_MSVC_TOOLS_DIR}/lib/${MSVC_ARCH}"
+    )
+
+    foreach (_p IN LISTS _SDK_LIBPATHS)
+        if (EXISTS "${_p}")
+            string(APPEND _LIBPATH ";${_p}")
+        endif ()
+    endforeach ()
 
     # /I
     set(_MSVC_INC_FLAGS "")
     string(REPLACE ";" "\n" _tmp "${_INCLUDE}")
     string(REPLACE "\n" ";" _inc_list "${_tmp}")
-    foreach(_p IN LISTS _inc_list)
-        if(NOT _p STREQUAL "")
+    foreach (_p IN LISTS _inc_list)
+        if (NOT _p STREQUAL "")
             file(TO_CMAKE_PATH "${_p}" _p2)
             string(APPEND _MSVC_INC_FLAGS " /I\"${_p2}\"")
-        endif()
-    endforeach()
+        endif ()
+    endforeach ()
 
     # /LIBPATH
     set(_MSVC_LIBPATH_FLAGS "")
-    foreach(_raw IN ITEMS "${_LIB}" "${_LIBPATH}")
-        if(NOT _raw STREQUAL "")
+    foreach (_raw IN ITEMS "${_LIB}" "${_LIBPATH}")
+        if (NOT _raw STREQUAL "")
             string(REPLACE ";" "\n" _tmp "${_raw}")
             string(REPLACE "\n" ";" _lib_list "${_tmp}")
-            foreach(_p IN LISTS _lib_list)
-                if(NOT _p STREQUAL "")
+            foreach (_p IN LISTS _lib_list)
+                if (NOT _p STREQUAL "")
                     file(TO_CMAKE_PATH "${_p}" _p2)
                     string(APPEND _MSVC_LIBPATH_FLAGS " /LIBPATH:\"${_p2}\"")
-                endif()
-            endforeach()
-        endif()
-    endforeach()
+                endif ()
+            endforeach ()
+        endif ()
+    endforeach ()
 
     message(STATUS "MSVC env imported (${MSVC_ARCH}) via VsDevCmd.bat")
-endif()
+endif ()
 
 # Compilers and linker paths
 set(CMAKE_C_COMPILER "${_CL_EXE}" CACHE FILEPATH "" FORCE)
@@ -181,9 +209,9 @@ set(CMAKE_CXX_COMPILER "${_CL_EXE}" CACHE FILEPATH "" FORCE)
 set(CMAKE_LINKER "${_LINK_EXE}" CACHE FILEPATH "" FORCE)
 
 # Inject include/lib paths
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}${_MSVC_INC_FLAGS}"   CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}${_MSVC_INC_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}${_MSVC_INC_FLAGS}" CACHE STRING "" FORCE)
-set(CMAKE_EXE_LINKER_FLAGS    "${CMAKE_EXE_LINKER_FLAGS}${_MSVC_LIBPATH_FLAGS}"    CACHE STRING "" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}${_MSVC_LIBPATH_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}${_MSVC_LIBPATH_FLAGS}" CACHE STRING "" FORCE)
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}${_MSVC_LIBPATH_FLAGS}" CACHE STRING "" FORCE)
 

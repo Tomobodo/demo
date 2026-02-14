@@ -42,7 +42,16 @@
       "inherits": "base-windows",
       "binaryDir": "${sourceDir}/build/windows/Debug",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "SHOW_FPS": "ON"
+      }
+    },
+    {
+      "name": "Debug_windows_hotreload",
+      "inherits": "Debug_windows",
+      "binaryDir": "${sourceDir}/build/windows/Debug_Hotreload",
+      "cacheVariables": {
+        "HOTRELOAD": "ON"
       }
     },
     {
@@ -85,6 +94,11 @@
     {
       "name": "Debug_windows",
       "configurePreset": "Debug_windows",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Debug_windows_hotreload",
+      "configurePreset": "Debug_windows_hotreload",
       "configuration": "Debug"
     },
     {
