@@ -11,13 +11,38 @@ all is left to do is some audio glue and an actual demo...
 ## TODO
 
 - [x] hotreload in wasm32
-- [ ] hotreload in win32
+- [x] hotreload in win32
 - [ ] audio glue code with webaudio api
 
 ## Building
 
 Use cmake, I made some presets.  
 Make sure you have Crinkler and wasm-ld, wasm-strip, clang in your path.
+
+### windows with hot reload
+
+#### Build the demo
+
+```shell
+cmake --preset Debug_windows_hotreload
+
+cmake --build --preset Debug_windows_hotreload
+```
+
+Then run the demo.
+
+While the demo is runing, make some change in the src/demo/demo.cpp file
+
+Then rebuild the library :
+
+```shell
+cmake --build --preset Debug_windows_hotreload --target demo_lib
+```
+
+The demo should detect changes in its working directory and reload the library
+
+Then configure your editor of choice to rebuild anytime you save.
+I use clion and the file watcher plugin to trigger the above cmake command everytime i save.
 
 ### wasm with hot reload
 
