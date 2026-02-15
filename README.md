@@ -8,11 +8,14 @@ workflow and debugging.
 
 all is left to do is some audio glue and an actual demo...
 
-## TODO
+## Features
 
-- [x] hotreload in wasm32
-- [x] hotreload in win32
-- [ ] audio glue code with webaudio api
+- hotreload in wasm32
+- hotreload in win32
+
+### Todo
+
+- cross platform audio glue code with webaudio api
 
 ## Building
 
@@ -31,7 +34,7 @@ cmake --build --preset Debug_windows_hotreload
 
 Then run the demo.
 
-While the demo is runing, make some change in the src/demo/demo.cpp file
+While the demo is running, make some change in the src/demo/demo.cpp file
 
 Then rebuild the library :
 
@@ -43,6 +46,12 @@ The demo should detect changes in its working directory and reload the library
 
 Then configure your editor of choice to rebuild anytime you save.
 I use clion and the file watcher plugin to trigger the above cmake command everytime i save.
+
+You can also use watchexec
+
+```shell
+watchexec -e cpp,hpp -- "cmake --build --preset Debug_window_hotreload"  
+```
 
 ### wasm with hot reload
 
