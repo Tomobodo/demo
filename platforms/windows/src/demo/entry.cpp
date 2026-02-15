@@ -12,7 +12,29 @@
 #define BUFFER_HEIGHT 480
 #endif
 
-constexpr float ASPECT_RATIO = (float)BUFFER_WIDTH / (float)BUFFER_HEIGHT;
+constexpr float ASPECT_RATIO = static_cast<float>(BUFFER_WIDTH) / static_cast<float>(BUFFER_HEIGHT);
+
+void update_window_size(const HWND& window_handle, bool fullscreen)
+{
+	MONITORINFO mi = {sizeof(mi)};
+	GetMonitorInfo(MonitorFromWindow(window_handle, MONITOR_DEFAULTTOPRIMARY), &mi);
+
+	const HDC hdc = GetDC(window_handle);
+
+	if (fullscreen)
+		SetWindowPos(window_handle, HWND_TOP,
+		             mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
+		             mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	else
+		SetWindowPos(
+			window_handle, HWND_TOP,
+			(mi.rcMonitor.right - BUFFER_WIDTH) / 2, (mi.rcMonitor.bottom - BUFFER_HEIGHT) / 2,
+			BUFFER_WIDTH, BUFFER_HEIGHT, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+
+	RECT rc;
+	GetClientRect(window_handle, &rc);
+	FillRect(hdc, &rc, static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+}
 
 extern "C" {
 #pragma function(memset)
@@ -129,13 +151,8 @@ void entry()
 
 	const HWND window_handle = CreateWindowEx(0,
 	                                          reinterpret_cast<LPCSTR>(0x8000), nullptr,
-#ifdef FULLSCREEN
-	                                          WS_POPUP | WS_VISIBLE | WS_MAXIMIZE,
-	                                          0, 0, 0, 0,
-#else
 	                                          WS_POPUP | WS_VISIBLE,
 	                                          0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
-#endif
 	                                          nullptr, nullptr, nullptr, nullptr
 	);
 
@@ -166,15 +183,12 @@ void entry()
 	MSG msg;
 
 	bool loop = true;
-	RECT rc;
-	GetClientRect(window_handle, &rc);
-
-	auto dest_width = static_cast<int>(static_cast<float>(rc.bottom) * ASPECT_RATIO);
-	auto blit_x = (rc.right - dest_width) / 2;
-
-	FillRect(hdc, &rc, static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
-
+	bool fullscreen = false;
 	init();
+
+	RECT rc;
+
+	update_window_size(window_handle, fullscreen);
 
 	while (loop)
 	{
@@ -215,29 +229,19 @@ void entry()
 
 			if (msg.message == WM_KEYDOWN && msg.wParam == VK_F11)
 			{
-				MONITORINFO mi = {sizeof(mi)};
-				GetMonitorInfo(MonitorFromWindow(window_handle, MONITOR_DEFAULTTOPRIMARY), &mi);
-
-				SetWindowPos(window_handle, HWND_TOP,
-				             mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
-				             mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+				fullscreen = !fullscreen;
+				update_window_size(window_handle, fullscreen);
 			}
 
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
 
-		update(time);
-		RECT current_rc;
-		GetClientRect(window_handle, &current_rc);
+		GetClientRect(window_handle, &rc);
+		auto dest_width = static_cast<int>(static_cast<float>(rc.bottom) * ASPECT_RATIO);
+		auto blit_x = (rc.right - dest_width) / 2;
 
-		if (current_rc.bottom != rc.bottom || current_rc.right != rc.right)
-		{
-			rc = current_rc;
-			dest_width = static_cast<int>(static_cast<float>(rc.bottom) * ASPECT_RATIO);
-			blit_x = (rc.right - dest_width) / 2;
-			FillRect(hdc, &rc, static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
-		}
+		update(time);
 
 		// blit bitmap
 		StretchDIBits(hdc,
