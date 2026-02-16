@@ -10,27 +10,27 @@ void rotoz(float time, const Rect& src_rect, const PixelBuffer& dst_buf)
 {
     unsigned int* ptr = dst_buf.pixels;
 
-    const auto half_width = dst_buf.width * .5f;
-    const auto half_height = dst_buf.height * .5f;
+    const auto half_width = static_cast<float>(dst_buf.width) * .5f;
+    const auto half_height = static_cast<float>(dst_buf.height) * .5f;
     const auto scale = fast_sin(time * 3.45368f) * 0.5f + 2;
 
-    const auto sin_t = fast_sin(time * 4);
-    const auto cos_t = fast_cos(time);
+    const auto sin_t = fast_sin(time) * scale;
+    const auto cos_t = fast_cos(time) * scale;
 
     for (int y = 0; y < dst_buf.height; ++y)
     {
-        constexpr int cell_size_shift = 6;
-
         for (int x = 0; x < dst_buf.width; ++x)
         {
+            constexpr int CELL_SIZE_SHIFT = 7;
+
             const float px = x - half_width;
             const float py = y - half_height;
 
-            const int fx = static_cast<int>((px * cos_t - py * sin_t) * scale);
-            const int fy = static_cast<int>((px * sin_t + py * cos_t) * scale);
+            const int fx = static_cast<int>(px * cos_t - py * sin_t);
+            const int fy = static_cast<int>(px * sin_t + py * cos_t);
 
-            const int cell_x = fx >> cell_size_shift;
-            const int cell_y = fy >> cell_size_shift;
+            const int cell_x = fx >> CELL_SIZE_SHIFT;
+            const int cell_y = fy >> CELL_SIZE_SHIFT;
 
             const int dark = (cell_y ^ cell_x) & 1;
 

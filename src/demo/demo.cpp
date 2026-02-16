@@ -27,7 +27,7 @@ DrawFunction current_drawable = nullptr;
 
 void demo_init()
 {
-    current_drawable = &scene_a;
+    current_drawable = &rotoz;
 }
 
 void demo_update(const float time)
