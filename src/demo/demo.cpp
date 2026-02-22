@@ -39,7 +39,7 @@ void demo_update(const float time)
 {
     static unsigned int frame = 0;
     frame++;
-    const auto scene_index = static_cast<int>(time * 0.1f) % 4;
+    const auto scene_index = static_cast<int>(time * 1.0f) % 4;
     drawables[scene_index](time, frame, FULL_BUFFER, pixel_buffer);
 }
 

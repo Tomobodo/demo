@@ -14,6 +14,8 @@ add_subdirectory(src/engine)
 target_sources(
         ${TARGET} PRIVATE
         src/demo/scene_a.cpp
+        src/demo/plasma.cpp
+        src/demo/rotoz.cpp
 )
 
 target_compile_options(

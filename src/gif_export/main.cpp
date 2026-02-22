@@ -4,12 +4,21 @@
 #include<print>
 #include<string>
 
-#include "engine/frame_infos.hpp"
 #include "engine/color.hpp"
 
 #include "demo/scene_a.hpp"
+#include "demo/plasma.hpp"
+#include "demo/rotoz.hpp"
+
+#include "engine/drawable.hpp"
 
 #include "vendor/msf_gif.h"
+
+DrawFunction drawables[] = {
+   &scene_a,
+   &plasma,
+   &rotoz
+};
 
 int main(const int argc, const char** argv)
 {
@@ -61,7 +70,9 @@ int main(const int argc, const char** argv)
    {
       auto pixels = new unsigned char[total_gif_pixels * 4];
 
-      scene_a(time, rect, demo_buf);
+      const auto scene_index = (i / 250) % 3;
+
+      drawables[scene_index](time, i, rect, demo_buf);
 
       time += delta_time;
 
