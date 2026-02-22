@@ -4,6 +4,7 @@
 #include "demo/scene_a.hpp"
 #include "demo/scene_b.hpp"
 #include "demo/rotoz.hpp"
+#include "demo/plasma.hpp"
 
 #include "engine/drawable.hpp"
 
@@ -23,16 +24,23 @@ PixelBuffer pixel_buffer{
     .pixels = main_buffer
 };
 
-DrawFunction current_drawable = nullptr;
+DrawFunction drawables[] = {
+    &scene_a,
+    &scene_b,
+    &plasma,
+    &rotoz,
+};
 
 void demo_init()
 {
-    current_drawable = &rotoz;
 }
 
 void demo_update(const float time)
 {
-    current_drawable(time, FULL_BUFFER, pixel_buffer);
+    static unsigned int frame = 0;
+    frame++;
+    const auto scene_index = static_cast<int>(time * 0.1f) % 4;
+    drawables[scene_index](time, frame, FULL_BUFFER, pixel_buffer);
 }
 
 unsigned int* demo_get_buffer()

@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+constexpr float PI = 3.1415926f;
+constexpr float THETA = PI * 2.0f;
+
 extern "C" int __cdecl abs(int);
 #pragma intrinsic(abs)
 

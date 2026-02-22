@@ -4,4 +4,5 @@
         scene_b.cpp
         rotoz.cpp
         demo.cpp
+        plasma.cpp
 )
