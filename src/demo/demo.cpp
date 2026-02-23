@@ -6,7 +6,7 @@
 #include "demo/rotoz.hpp"
 #include "demo/plasma.hpp"
 
-#include "engine/drawable.hpp"
+#include "engine/timeline.hpp"
 
 constexpr Rect FULL_BUFFER =
 {
@@ -24,26 +24,50 @@ PixelBuffer pixel_buffer{
     .pixels = main_buffer
 };
 
-DrawFunction drawables[] = {
-    &scene_a,
-    &scene_b,
-    &plasma,
-    &rotoz,
+constexpr Clip clips[] = {
+    {
+        .start_time = 0,
+        .duration = 5.0f,
+        .drawable = &scene_a
+    },
+    {
+        .start_time = 5.0f,
+        .duration = 5.0f,
+        .drawable = &plasma
+    },
+    {
+        .start_time = 10.0f,
+        .duration = 10.0f,
+        .drawable = &scene_b
+    }
 };
+
+Timeline* timeline;
 
 void demo_init()
 {
+    timeline = new Timeline(clips, &pixel_buffer);
+}
+
+void demo_deinit()
+{
+    delete timeline;
 }
 
 void demo_update(const float time)
 {
     static unsigned int frame = 0;
     frame++;
-    const auto scene_index = static_cast<int>(time * 1.0f) % 4;
-    drawables[scene_index](time, frame, FULL_BUFFER, pixel_buffer);
+
+    timeline->render(time, frame);
 }
 
 unsigned int* demo_get_buffer()
 {
     return main_buffer;
+}
+
+float demo_get_duration()
+{
+    return timeline->duration();
 }

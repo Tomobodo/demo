@@ -19,16 +19,16 @@ PixelBuffer scene_a_dst = {
     .pixels = pixels
 };
 
-void scene_b(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer& dst_buf)
+void scene_b(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer* dst_buf)
 {
-    scene_a(time, frame, src_rect, scene_a_dst);
+    scene_a(time, frame, src_rect, &scene_a_dst);
 
     const unsigned int odd_frame = frame & 1;
 
-    unsigned int* ptr = dst_buf.pixels + odd_frame;
+    unsigned int* ptr = dst_buf->pixels + odd_frame;
 
-    const auto half_width = dst_buf.width * .5f;
-    const auto half_height = dst_buf.height * .5f;
+    const auto half_width = dst_buf->width * .5f;
+    const auto half_height = dst_buf->height * .5f;
 
     float roto_time = (time - 10.0f) * 0.1f;
     if (roto_time < 0.0f)
@@ -49,9 +49,9 @@ void scene_b(float time, const unsigned int frame, const Rect& src_rect, const P
 
     const unsigned int frame_parity = frame & 1;
 
-    for (int y = 0; y < dst_buf.height; ++y)
+    for (int y = 0; y < dst_buf->height; ++y)
     {
-        for (int x = 0; x < dst_buf.width; x += 2)
+        for (int x = 0; x < dst_buf->width; x += 2)
         {
             const float px = x - half_width * lerp_roto;
             const float py = y - half_height * lerp_roto;

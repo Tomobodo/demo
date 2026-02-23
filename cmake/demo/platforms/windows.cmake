@@ -1,6 +1,8 @@
 ﻿target_sources(
         ${TARGET} PRIVATE
         ${PLATFORM_SRC}/demo/entry.cpp
+        $<$<CONFIG:RelWithDebInfo>:${PLATFORM_SRC}/demo/debug_tools.cpp>
+        ${PLATFORM_SRC}/engine/memory.cpp
 )
 
 set_target_properties(
@@ -40,6 +42,7 @@ target_link_libraries(
         user32.lib
         gdi32.lib
         dwmapi.lib
+        $<$<CONFIG:RelWithDebInfo>:comctl32.lib>
 )
 
 if (HOTRELOAD)

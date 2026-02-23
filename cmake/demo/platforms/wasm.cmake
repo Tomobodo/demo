@@ -6,6 +6,11 @@ math(EXPR MAX_MEMORY "${MAX_MEMORY_PAGES} * 65536")
 
 set(OUTPUT_DIST_DIR "${PROJECT_BINARY_DIR}/dist")
 
+target_sources(
+        ${TARGET} PRIVATE
+        ${PLATFORM_SRC}/engine/memory.cpp
+)
+
 set_target_properties(
         ${TARGET} PROPERTIES
         PREFIX ""

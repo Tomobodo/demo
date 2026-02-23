@@ -6,13 +6,13 @@
 constexpr Color A = 0xFF1B5ABF, B = 0xFF1349A1, C = 0xFFEB5E13, D = 0xFFBF5A08;
 Color ROTO_PALETTE[2] = {A, B};
 
-void rotoz(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer& dst_buf)
+void rotoz(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer* dst_buf)
 {
     const unsigned int odd_frame = frame & 1;
-    unsigned int* ptr = dst_buf.pixels + odd_frame;
+    unsigned int* ptr = dst_buf->pixels + odd_frame;
 
-    const auto half_width = static_cast<float>(dst_buf.width) * .5f;
-    const auto half_height = static_cast<float>(dst_buf.height) * .5f;
+    const auto half_width = static_cast<float>(dst_buf->width) * .5f;
+    const auto half_height = static_cast<float>(dst_buf->height) * .5f;
     const auto scale = fast_sin(time * 3.45368f) * 0.5f + 2;
 
     const auto sin_t = fast_sin(time) * scale;
@@ -20,9 +20,9 @@ void rotoz(float time, const unsigned int frame, const Rect& src_rect, const Pix
 
     const unsigned int frame_parity = frame & 1;
 
-    for (int y = 0; y < dst_buf.height; ++y)
+    for (int y = 0; y < dst_buf->height; ++y)
     {
-        for (int x = 0; x < dst_buf.width; x += 2)
+        for (int x = 0; x < dst_buf->width; x += 2)
         {
             constexpr int CELL_SIZE_SHIFT = 7;
 
