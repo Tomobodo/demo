@@ -1,6 +1,5 @@
 ﻿#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <dwmapi.h>
 
 #include "demo/demo.hpp"
 
@@ -11,6 +10,11 @@
 #ifndef BUFFER_HEIGHT
 #define BUFFER_HEIGHT 480
 #endif
+
+#ifdef DEBUG
+#include "debug_tools.hpp"
+#endif
+
 
 constexpr float ASPECT_RATIO = static_cast<float>(BUFFER_WIDTH) / static_cast<float>(BUFFER_HEIGHT);
 
@@ -50,15 +54,12 @@ void* __cdecl memset(void* dest, int c, size_t count)
 int _fltused = 0;
 
 #ifdef HOTRELOAD
-typedef void (*DemoVoidFunc)();
-typedef void (*DemoFloatFunc)(float);
-typedef unsigned int* (*DemoRetIntPtrFunc)();
 
-decltype(demo_init)* init = nullptr;
-
-decltype(demo_update)* update = nullptr;
-
-decltype(demo_get_buffer)* get_buffer = nullptr;
+decltype(&demo_init) init = nullptr;
+decltype(&demo_deinit) deinit = nullptr;
+decltype(&demo_update) update = nullptr;
+decltype(&demo_get_buffer) get_buffer = nullptr;
+decltype(&demo_get_duration) get_duration = nullptr;
 
 HINSTANCE lib_handle = nullptr;
 bool need_to_reload_lib = true;
@@ -73,9 +74,11 @@ void load_lib()
 	lib_handle = LoadLibrary(TEXT(HOTRELOAD_LIB_LOCKED_NAME));
 	if (lib_handle != nullptr)
 	{
-		init = reinterpret_cast<DemoVoidFunc>(GetProcAddress(lib_handle, "demo_init"));
-		update = reinterpret_cast<DemoFloatFunc>(GetProcAddress(lib_handle, "demo_update"));
-		get_buffer = reinterpret_cast<DemoRetIntPtrFunc>(GetProcAddress(lib_handle, "demo_get_buffer"));
+		init = reinterpret_cast<decltype(init)>(GetProcAddress(lib_handle, "demo_init"));
+		deinit = reinterpret_cast<decltype(deinit)>(GetProcAddress(lib_handle, "demo_deinit"));
+		update = reinterpret_cast<decltype(update)>(GetProcAddress(lib_handle, "demo_update"));
+		get_buffer = reinterpret_cast<decltype(get_buffer)>(GetProcAddress(lib_handle, "demo_get_buffer"));
+		get_duration = reinterpret_cast<decltype(get_duration)>(GetProcAddress(lib_handle, "demo_get_duration"));
 		need_to_reload_lib = false;
 	}
 	else
@@ -137,23 +140,26 @@ void start_dll_watcher()
 
 #else
 constexpr auto& init = demo_init;
+constexpr auto& deinit = demo_deinit;
 constexpr auto& update = demo_update;
 constexpr auto& get_buffer = demo_get_buffer;
+constexpr auto& get_duration = demo_get_duration;
 #endif
 
 void entry()
 {
+	HINSTANCE hinstance = GetModuleHandle(nullptr);
 #ifdef HOTRELOAD
 	load_lib();
 
 	start_dll_watcher();
 #endif
 
-	const HWND window_handle = CreateWindowEx(0,
-	                                          reinterpret_cast<LPCSTR>(0x8000), nullptr,
-	                                          WS_POPUP | WS_VISIBLE,
-	                                          0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
-	                                          nullptr, nullptr, nullptr, nullptr
+	HWND window_handle = CreateWindowEx(0,
+	                                    reinterpret_cast<LPCSTR>(0x8000), nullptr,
+	                                    WS_POPUP | WS_VISIBLE,
+	                                    0, 0, BUFFER_WIDTH, BUFFER_HEIGHT,
+	                                    nullptr, nullptr, hinstance, nullptr
 	);
 
 	HDC hdc = GetDC(window_handle);
@@ -171,8 +177,6 @@ void entry()
 	QueryPerformanceCounter(&t_start);
 
 #if defined(DEBUG) || defined(SHOW_FPS)
-	LARGE_INTEGER t_start_dbg_fps;
-	QueryPerformanceCounter(&t_start_dbg_fps);
 	float delta_samples = 0;
 	int fps_samples = 0;
 	int fps = 0;
@@ -186,6 +190,12 @@ void entry()
 	bool fullscreen = false;
 	init();
 
+	float time = 0;
+
+#if defined(DEBUG)
+	init_debug_tool(hinstance, get_duration(), &time);
+#endif
+
 	RECT rc;
 
 	update_window_size(window_handle, fullscreen);
@@ -195,18 +205,22 @@ void entry()
 #ifdef HOTRELOAD
 		if (need_to_reload_lib)
 		{
+			deinit();
 			load_lib();
 			init();
 		}
 #endif
 
 		QueryPerformanceCounter(&t_end);
+		float delta = static_cast<float>(t_end.LowPart - t_start.LowPart) / static_cast<float>(
+			frequency);
 
-		const float time = static_cast<float>(t_end.LowPart - t_start.LowPart) / static_cast<float>(frequency);
+		time += delta;
+
+		t_start = t_end;
 
 #if defined(DEBUG) || defined(SHOW_FPS)
-		delta_samples += static_cast<float>(t_end.LowPart - t_start_dbg_fps.LowPart) / static_cast<float>(
-			frequency);
+		delta_samples += delta;
 		fps_samples++;
 		if (delta_samples >= 1.0f)
 		{
@@ -214,7 +228,10 @@ void entry()
 			fps_samples = 0;
 			delta_samples -= 1.0f;
 		}
-		t_start_dbg_fps = t_end;
+#endif
+
+#ifdef DEBUG)
+		update_debug_tool(time);
 #endif
 
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -262,6 +279,8 @@ void entry()
 #endif
 		//DwmFlush();
 	}
+
+	deinit();
 
 	ExitProcess(0);
 }

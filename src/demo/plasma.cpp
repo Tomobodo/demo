@@ -36,10 +36,10 @@ Color get_color(float v)
     return colors[index];
 }
 
-void plasma(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer& dst_buf)
+void plasma(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer* dst_buf)
 {
     const unsigned int odd_frame = frame & 1;
-    unsigned int* ptr = dst_buf.pixels + odd_frame;
+    unsigned int* ptr = dst_buf->pixels + odd_frame;
 
     float t = time * 2.0f;
 

@@ -10,7 +10,11 @@
 extern "C" {
 DEMO_API void demo_init();
 
+DEMO_API void demo_deinit();
+
 DEMO_API void demo_update(float time);
 
 DEMO_API unsigned int* demo_get_buffer();
+
+DEMO_API float demo_get_duration();
 };

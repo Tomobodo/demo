@@ -6,7 +6,7 @@
 constexpr Color A = 0xFF1B5ABF, B = 0xFF1349A1, C = 0xFFEB5E13, D = 0xFFBF5A08;
 Color BG_PALETTE[2] = {0, 0};
 
-void scene_a(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer& dst_buf)
+void scene_a(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer* dst_buf)
 {
 	constexpr float HVEL = 100.0f;
 	constexpr int BSIZE = 32;
@@ -14,8 +14,8 @@ void scene_a(float time, const unsigned int frame, const Rect& src_rect, const P
 
 	const unsigned int odd_frame = frame & 1;
 
-	const auto h_range = static_cast<int>(dst_buf.width) - BSIZE * 2;
-	const auto v_range = static_cast<int>(dst_buf.height) - BSIZE * 2;
+	const auto h_range = static_cast<int>(dst_buf->width) - BSIZE * 2;
+	const auto v_range = static_cast<int>(dst_buf->height) - BSIZE * 2;
 
 	const auto ball_incr = static_cast<int>(HVEL * time);
 
@@ -25,7 +25,7 @@ void scene_a(float time, const unsigned int frame, const Rect& src_rect, const P
 	const auto draw_ball_y = abs(
 		(ball_incr + v_range) % (v_range * 2) - v_range) + BSIZE;
 
-	unsigned int* ptr = dst_buf.pixels + odd_frame;
+	unsigned int* ptr = dst_buf->pixels + odd_frame;
 
 	constexpr float BACKGROUND_CIRCLE_RADIUS = 200.f;
 	const int y_offset = static_cast<int>(fast_sin(time) * BACKGROUND_CIRCLE_RADIUS);
@@ -38,7 +38,7 @@ void scene_a(float time, const unsigned int frame, const Rect& src_rect, const P
 	BG_PALETTE[0] = lerp_color(A, C, t);
 	BG_PALETTE[1] = lerp_color(B, D, t);
 
-	for (int y = 0; y < dst_buf.height; y++)
+	for (int y = 0; y < dst_buf->height; y++)
 	{
 		constexpr unsigned int CELLS_SIZE_SHIFT = 6;
 		const unsigned y_cell = (y + y_offset) >> CELLS_SIZE_SHIFT;
@@ -48,7 +48,7 @@ void scene_a(float time, const unsigned int frame, const Rect& src_rect, const P
 
 		const int x_line_offset = static_cast<int>(fast_sin((y + y_offset + time * 100.0f) / 100.0f) * bg_fx_strength);
 
-		for (int x = 0; x < dst_buf.width; x += 2)
+		for (int x = 0; x < dst_buf->width; x += 2)
 		{
 			const unsigned x_cell = (x + x_offset + x_line_offset) >> CELLS_SIZE_SHIFT;
 
