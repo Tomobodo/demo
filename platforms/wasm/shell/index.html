@@ -20,7 +20,7 @@
     </div>
     <div class="controls">
         <div class="progress">
-            <input id="seekbar" min="0" step="1" type="range" />
+            <input id="seekbar" min="0" step="0.01" type="range" />
         </div>
         <button id="playpause" onclick="onPlayPause()">pause</button>
         <button onclick="fullscreen()">fullscreen</button>
@@ -58,13 +58,15 @@
         document.getElementById('playpause').innerHTML = canvas.isPlaying() ? "Pause" : "Play"
     })
 
+    canvas.addEventListener('ready', (e) => {
+        const { duration } = e.detail
+
+        seekbar.max = duration
+        seekbar.min = 0
+    })
+
     canvas.addEventListener('frame', (e) => {
         const { time } = e.detail
-
-        max_time = Math.max(time || 0, max_time)
-        seekbar.max = max_time
-        seekbar.min = 0
-
         seekbar.value = time
     })
 
@@ -80,7 +82,7 @@
     })
 
     seekbar.addEventListener('input', (e) => {
-        canvas.seek(parseInt(seekbar.value))
+        canvas.seek(parseFloat(seekbar.value))
     })
 
 </script>
