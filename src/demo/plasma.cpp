@@ -27,7 +27,7 @@ void compute_palette()
     palette_computed = true;
 }
 
-Color get_color(float v)
+unsigned int get_color(float v)
 {
     compute_palette();
 

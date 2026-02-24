@@ -7,6 +7,7 @@
 #include "demo/plasma.hpp"
 
 #include "engine/timeline.hpp"
+#include "engine/maths.hpp"
 
 constexpr Rect FULL_BUFFER =
 {
@@ -46,6 +47,7 @@ Timeline* timeline;
 
 void demo_init()
 {
+    init_sin_lut();
     timeline = new Timeline(clips, &pixel_buffer);
 }
 

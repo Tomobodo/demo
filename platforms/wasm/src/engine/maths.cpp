@@ -1,9 +1,11 @@
-﻿float fast_sin(float angle)
+﻿#include "engine/maths.hpp"
+
+float sin(float angle)
 {
 	return __builtin_sinf(angle);
 }
 
-float fast_cos(float angle)
+float cos(float angle)
 {
-	return __builtin_cosf(angle);
+	return sin(angle + PI / 2.0f);
 }

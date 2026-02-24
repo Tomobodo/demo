@@ -1,6 +1,8 @@
-﻿#include <intrin.h>
+﻿#include "engine/maths.hpp"
 
-float fast_sin(float angle)
+#include <intrin.h>
+
+float sin(float angle)
 {
 	float result;
 	__asm {
@@ -11,17 +13,10 @@ float fast_sin(float angle)
 	return result;
 }
 
-float fast_cos(float angle)
+float cos(float angle)
 {
-	float result;
-	__asm {
-		fld angle
-		fcos
-		fstp result
-		}
-	return result;
+	return sin(angle + PI / 2.0f);
 }
-
 
 float fast_sqrt(float val)
 {
