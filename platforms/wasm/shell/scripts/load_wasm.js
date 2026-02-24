@@ -27,7 +27,7 @@
     }
 
     canvas.play = () => {
-        last_time = Date.now()
+        last_time = Date.now();
         isPlaying = true;
         loop();
         canvas.dispatchEvent(new CustomEvent('play'))
@@ -52,7 +52,7 @@
     }
 
     const updateCanvas = (time, no_dispatch) => {
-        exports.demo_update(time / 1000);
+        exports.demo_update(time);
 
         const offset = exports.demo_get_buffer();
 
@@ -70,7 +70,7 @@
     }
 
     const loop = () => {
-        const delta = Date.now() - last_time
+        const delta = (Date.now() - last_time) / 1000.0
         last_time = Date.now();
 
         time += delta;
@@ -94,6 +94,14 @@
         exports = instance.exports
 
         exports.demo_init()
+
+        const duration = exports.demo_get_duration();
+
+        canvas.dispatchEvent(new CustomEvent('ready', {
+            detail: {
+                duration: duration
+            }
+        }))
 
         updateCanvas(time)
     }
