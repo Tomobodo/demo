@@ -15,7 +15,9 @@ target_compile_options(
         /std:c++latest
         /GS-
         /Oi
-        /Os
+        /arch:AVX2
+        /Qvec-report:2
+        /fp:fast
         $<$<CONFIG:RelWithDebInfo>:/Od /Z7 /DDEBUG>
         $<$<CONFIG:Release>:/EHa-s-c- /Zl /O2 /Gw /Gy>
 )
@@ -31,8 +33,21 @@ if (USE_CRINKLER)
             ${TARGET} PRIVATE
             /TINYHEADER
             /TINYIMPORT
+            /OPT:NOICF
+            /LTCG:NOSTATUS
             /COMPMODE:VERYSLOW
             /ORDERTRIES:1000
+            /LARGEADDRESSAWARE:NO
+            /CRINKLER
+            /PRIORITY:NORMAL
+            /UNSAFEIMPORT
+            /TRANSFORM:CALLS
+            /NOINITIALIZERS
+            /TRUNCATEFLOATS:16
+            /OVERRIDEALIGNMENTS
+            /UNALIGNCODE
+            /REPORT:report.html
+            /PROGRESSGUI
     )
 endif ()
 
