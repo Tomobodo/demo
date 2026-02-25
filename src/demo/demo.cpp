@@ -25,21 +25,29 @@ PixelBuffer pixel_buffer{
     .pixels = main_buffer
 };
 
+// constexpr Clip clips[] = {
+//     {
+//         .start_time = 0,
+//         .duration = 5.0f,
+//         .drawable = &scene_a
+//     },
+//     {
+//         .start_time = 5.0f,
+//         .duration = 5.0f,
+//         .drawable = &plasma
+//     },
+//     {
+//         .start_time = 10.0f,
+//         .duration = 10.0f,
+//         .drawable = &scene_b
+//     }
+// };
+
 constexpr Clip clips[] = {
     {
-        .start_time = 0,
-        .duration = 5.0f,
-        .drawable = &scene_a
-    },
-    {
-        .start_time = 5.0f,
-        .duration = 5.0f,
+        .start_time = 0.0f,
+        .duration = 200.0f,
         .drawable = &plasma
-    },
-    {
-        .start_time = 10.0f,
-        .duration = 10.0f,
-        .drawable = &scene_b
     }
 };
 

@@ -5,7 +5,7 @@ float lerp(float a, float b, float t)
 	return a + t * (b - a);
 }
 
-constexpr unsigned int SIN_LUT_SIZE = 512;
+constexpr unsigned int SIN_LUT_SIZE = 1024;
 constexpr float RAD_TO_STEP = SIN_LUT_SIZE / (2.0f * PI);
 
 float sin_lut[SIN_LUT_SIZE];
