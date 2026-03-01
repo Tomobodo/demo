@@ -1,4 +1,4 @@
-﻿#include "demo/scene_a.hpp"
+﻿#include "scene_a.hpp"
 
 #include "engine/maths.hpp"
 #include "engine/color.hpp"

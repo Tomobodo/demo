@@ -1,11 +1,11 @@
 import chokidar from 'chokidar'
-import { WebSocketServer } from 'ws'
-import { spawn, exec } from 'child_process'
+import {WebSocketServer} from 'ws'
+import {exec, spawn} from 'child_process'
 import express from 'express'
 
 const WEB_SERVER_PORT = 8080
 const WEB_SOCKET_PORT = 8081
-const BUILD_PATH = "build/wasm/Debug/dist"
+const BUILD_PATH = "build/wasm32/Debug/dist"
 
 // http server
 
@@ -51,7 +51,7 @@ const source_watcher = chokidar.watch('src', {
     depth: 99
 })
 
-const shell_watcher = chokidar.watch('platforms/wasm/shell', {
+const shell_watcher = chokidar.watch('src/engine/wasm32/shell', {
     ignored: /(^|[\/\\])\../,
     ignoreInitial: true,
     depth: 99
@@ -68,9 +68,9 @@ shell_watcher.on('change', build_shell)
 function build(path) {
     console.log("Source file changed: ", path)
 
-    const preset_name = "Debug_wasm"
+    const preset_name = "Debug_wasm32"
 
-    const build = spawn('cmake', ['--build', '--preset', preset_name], { stdio: 'inherit'})
+    const build = spawn('cmake', ['--build', '--preset', preset_name], {stdio: 'inherit'})
 
     build.on('close', (code) => {
         if (code === 0) {
@@ -79,12 +79,12 @@ function build(path) {
     })
 }
 
-function build_shell (path) {
+function build_shell(path) {
     console.log("Shell file changed: ", path)
 
-    const preset_name = "Debug_wasm"
+    const preset_name = "Debug_wasm32"
 
-    const configure = spawn('cmake',['--preset', preset_name], { stdio: 'inherit'})
+    const configure = spawn('cmake', ['--preset', preset_name], {stdio: 'inherit'})
 
     configure.on('close', code => {
         if (code === 0) {

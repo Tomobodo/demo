@@ -1,4 +1,4 @@
-﻿#include "demo/rotoz.hpp"
+﻿#include "rotoz.hpp"
 
 #include "engine/color.hpp"
 #include "engine/maths.hpp"

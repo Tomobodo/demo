@@ -1,5 +1,4 @@
-﻿set(CMAKE_SYSTEM_NAME windows)
-set(CMAKE_SYSTEM_PROCESSOR ${MSVC_ARCH})
+﻿set(CMAKE_SYSTEM_PROCESSOR ${MSVC_ARCH})
 set(CMAKE_NINJA_FORCE_RESPONSE_FILE 1 CACHE INTERNAL "")
 
 if (NOT DEFINED MSVC_ARCH)
@@ -64,8 +63,8 @@ if (NOT DEFINED _MSVC_ENV_IMPORTED)
     endif ()
 
     # output vcvars in a file so it can works from both cmd or msys64 zsh
-    set(_ENV_TXT "${CMAKE_BINARY_DIR}/_msvc_env.txt")
-    set(_ENV_CMD "${CMAKE_BINARY_DIR}/_gen_msvc_env.cmd")
+    set(_ENV_TXT "${PROJECT_BINARY_DIR}/_msvc_env.txt")
+    set(_ENV_CMD "${PROJECT_BINARY_DIR}/_gen_msvc_env.cmd")
 
     file(WRITE "${_ENV_CMD}"
             "@echo off\r\n"

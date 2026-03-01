@@ -80,7 +80,7 @@
     }
 
     const load = async () => {
-        const response = await fetch('@TARGET@.wasm?' + Date.now());
+        const response = await fetch('@PROJECT_NAME@.wasm?' + Date.now());
         const bytes = await response.arrayBuffer();
         const {instance} = await WebAssembly.instantiate(bytes, {
             env: {

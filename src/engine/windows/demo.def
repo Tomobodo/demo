@@ -1,0 +1,7 @@
+﻿LIBRARY demo_lib
+EXPORTS
+    demo_init
+    demo_deinit
+    demo_update
+    demo_get_buffer
+    demo_get_duration

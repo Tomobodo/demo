@@ -1,13 +1,12 @@
-﻿#include "engine/pixel_buffer.hpp"
-
-#include "demo/demo.hpp"
-#include "demo/scene_a.hpp"
-#include "demo/scene_b.hpp"
-#include "demo/rotoz.hpp"
-#include "demo/plasma.hpp"
+﻿#include "engine/demo.hpp"
+#include "scene_a.hpp"
+#include "scene_b.hpp"
+#include "rotoz.hpp"
+#include "plasma.hpp"
 
 #include "engine/timeline.hpp"
 #include "engine/maths.hpp"
+#include "engine/pixel_buffer.hpp"
 
 constexpr Rect FULL_BUFFER =
 {
@@ -25,29 +24,26 @@ PixelBuffer pixel_buffer{
     .pixels = main_buffer
 };
 
-// constexpr Clip clips[] = {
-//     {
-//         .start_time = 0,
-//         .duration = 5.0f,
-//         .drawable = &scene_a
-//     },
-//     {
-//         .start_time = 5.0f,
-//         .duration = 5.0f,
-//         .drawable = &plasma
-//     },
-//     {
-//         .start_time = 10.0f,
-//         .duration = 10.0f,
-//         .drawable = &scene_b
-//     }
-// };
-
 constexpr Clip clips[] = {
     {
-        .start_time = 0.0f,
-        .duration = 200.0f,
+        .start_time = 0,
+        .duration = 5.0f,
+        .drawable = &scene_a
+    },
+    {
+        .start_time = 5.0f,
+        .duration = 5.0f,
         .drawable = &plasma
+    },
+    {
+        .start_time = 10.0f,
+        .duration = 5.0f,
+        .drawable = &scene_b
+    },
+    {
+        .start_time = 15.0f,
+        .duration = 5.0f,
+        .drawable = &rotoz
     }
 };
 
