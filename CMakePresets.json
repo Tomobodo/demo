@@ -2,25 +2,25 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "base-platform",
-      "hidden": true,
-      "generator": "Ninja"
-    },
-    {
       "name": "base-wasm32",
       "hidden": true,
-      "inherits": "base-platform",
+      "generator": "Ninja",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm32.cmake"
+        "CMAKE_SYSTEM_NAME": "wasm32",
+        "CMAKE_SYSTEM_PROCESSOR": "wasm32",
+        "CMAKE_CXX_COMPILER_TARGET": "wasm32-unknown-unknown",
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_LINKER": "wasm-ld",
+        "CMAKE_CXX_COMPILER_WORKS": "TRUE"
       }
     },
     {
-      "name": "base-windows",
+      "name": "base-windows-32",
       "hidden": true,
-      "inherits": "base-platform",
+      "generator": "Ninja",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/windows.cmake",
-        "MSVC_ARCH": "x86"
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_CXX_COMPILER_WORKS": "TRUE"
       },
       "vendor": {
         "jetbrains.com/clion": {
@@ -39,7 +39,7 @@
     },
     {
       "name": "Debug_windows",
-      "inherits": "base-windows",
+      "inherits": "base-windows-32",
       "binaryDir": "${sourceDir}/build/windows/Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
@@ -65,7 +65,7 @@
     },
     {
       "name": "Release_windows",
-      "inherits": "base-windows",
+      "inherits": "base-windows-32",
       "binaryDir": "${sourceDir}/build/windows/Release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
@@ -76,7 +76,8 @@
       "inherits": "Release_windows",
       "binaryDir": "${sourceDir}/build/windows/Release_Compressed",
       "cacheVariables": {
-        "USE_CRINKLER": "ON"
+        "USE_CRINKLER": "ON",
+        "CMAKE_LINKER": "Crinkler.exe"
       }
     }
   ],
@@ -104,6 +105,11 @@
     {
       "name": "Release_windows",
       "configurePreset": "Release_windows",
+      "configuration": "Release"
+    },
+    {
+      "name": "Release_windows_crinkler",
+      "configurePreset": "Release_windows_crinkler",
       "configuration": "Release"
     }
   ]
