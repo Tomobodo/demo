@@ -1,6 +1,6 @@
 ﻿# Demo template
 
-![The demo running, just a basic bouncing ball](demo.gif)
+![The demo running, just a basic bouncing ball](docs/demo.gif)
 
 Just a demo template to test some things out.  
 It has hot reloading and a seek bar for smooth  
@@ -10,8 +10,8 @@ all is left to do is some audio glue and an actual demo...
 
 ## Features
 
-- hotreload in wasm32
-- hotreload in win32
+- hotreload for wasm32
+- hotreload for windows
 
 ### Todo
 
@@ -34,7 +34,7 @@ cmake --build --preset Debug_windows_hotreload
 
 Then run the demo.
 
-While the demo is running, make some change in the src/demo/demo.cpp file
+While the demo is running, make some change in the src/demo directory
 
 Then rebuild the library :
 
@@ -42,10 +42,13 @@ Then rebuild the library :
 cmake --build --preset Debug_windows_hotreload --target demo_lib
 ```
 
+Best to use an IDE with the demo_lib target active so you can just press the build shortcut,
+I use clion so I just have to press F9 to trigger a build.
+
 The demo should detect changes in its working directory and reload the library
 
-Then configure your editor of choice to rebuild anytime you save.
-I use clion and the file watcher plugin to trigger the above cmake command everytime i save.
+You also can configure your editor of choice to rebuild anytime you save.
+In clion there is the file watcher plugin to trigger the above cmake command everytime you save.
 
 You can also use watchexec
 
@@ -57,32 +60,38 @@ watchexec -e cpp,hpp -- "cmake --build --preset Debug_window_hotreload"
 
 #### Build the demo
 
-First, check if the cmake/toolchains/wasm.cmake match your system.  
+First, check if the cmake/toolchains/wasm32.cmake match your system.  
 Some paths may differ.
 
 Then run :
 
 ```
-cmake --preset Debug_wasm 
+cmake --preset Debug_wasm32 
 
-cmake --build build/wasm/Debug
+cmake --build --preset Debug_wasm32
 ```
 
-The index.html file is generated in build/wasm/Debug/index.html
+The index.html file is generated in build/wasm32/Debug/dist/index.html
 
 #### Enable hot reloading
 
-Build the node server to notify index.html a new wasm build is available :
+First, install the dependencies :
 
 ```shell
-cd platforms/wasm/hot_reload_server
+cd tools/hot_reload_server
 npm install
-npm run dev
 ```
 
-then launch some file watcher to watch the source files and trigger a build.  
-I use CLion's file watcher plugin, you can also use watchexec :
+Then go back in the project's root andrun the bat or sh script depending on your os :
+
+linux / mac :
 
 ```shell
-watchexec -e cpp,hpp -- "cmake --build --preset Debug_wasm"    
+./start_wasm_hr.sh
+```
+
+windows:
+
+```shell
+./start_wasm_hr.bat
 ```

@@ -1,5 +1,4 @@
-﻿
-#include "debug_tools.hpp"
+﻿#include "../../../include/engine/debug_tools.hpp"
 
 #include <windows.h>
 #include <commctrl.h>

@@ -6,20 +6,28 @@ math(EXPR MAX_MEMORY "${MAX_MEMORY_PAGES} * 65536")
 
 set(OUTPUT_DIST_DIR "${PROJECT_BINARY_DIR}/dist")
 
+add_executable(${PROJECT_NAME})
+
 target_sources(
-        ${TARGET} PRIVATE
-        ${PLATFORM_SRC}/engine/memory.cpp
+        ${PROJECT_NAME} PRIVATE
+        maths.cpp
+        memory.cpp
+)
+
+target_link_libraries(
+        ${PROJECT_NAME} PRIVATE
+        ${PROJECT_NAME}_module
 )
 
 set_target_properties(
-        ${TARGET} PROPERTIES
+        ${PROJECT_NAME} PROPERTIES
         PREFIX ""
         SUFFIX ".wasm"
         RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIST_DIR}
 )
 
 target_compile_options(
-        ${TARGET} PRIVATE
+        ${PROJECT_NAME} PRIVATE
         -ffreestanding
         $<$<CONFIG:Release>: -O3 -Os>
         $<$<CONFIG:Debug>: -g -O0>
@@ -29,7 +37,7 @@ target_compile_options(
 )
 
 target_link_options(
-        ${TARGET} PRIVATE
+        ${PROJECT_NAME} PRIVATE
         -nostdlib
         -Wl,--no-entry
         -Wl,--export-all
@@ -51,8 +59,8 @@ if (USE_WASM_STRIP)
 
     if (WASM_STRIP)
         add_custom_command(
-                TARGET ${TARGET} POST_BUILD
-                COMMAND ${WASM_STRIP} $<TARGET_FILE:${TARGET}>
+                TARGET ${PROJECT_NAME} POST_BUILD
+                COMMAND ${WASM_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
                 COMMENT "Stripping Wasm binary..."
         )
     endif ()
@@ -64,7 +72,7 @@ if (HOTRELOAD)
     set(SHELL_HR_SCRIPT "<script src='scripts/hotreload.js'></script>")
 endif ()
 
-set(SHELL_SRC "${PROJECT_SOURCE_DIR}/platforms/wasm/shell")
+set(SHELL_SRC "${PROJECT_SOURCE_DIR}/src/engine/wasm32/shell")
 set(SHELL_DST "${OUTPUT_DIST_DIR}")
 
 file(GLOB_RECURSE ALL_FILES RELATIVE "${SHELL_SRC}" "${SHELL_SRC}/*")

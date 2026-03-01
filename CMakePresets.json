@@ -7,11 +7,11 @@
       "generator": "Ninja"
     },
     {
-      "name": "base-wasm",
+      "name": "base-wasm32",
       "hidden": true,
       "inherits": "base-platform",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "cmake/toolchains/wasm32.cmake"
       }
     },
     {
@@ -29,9 +29,9 @@
       }
     },
     {
-      "name": "Debug_wasm",
-      "inherits": "base-wasm",
-      "binaryDir": "${sourceDir}/build/wasm/Debug",
+      "name": "Debug_wasm32",
+      "inherits": "base-wasm32",
+      "binaryDir": "${sourceDir}/build/wasm32/Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "HOTRELOAD": "ON"
@@ -55,9 +55,9 @@
       }
     },
     {
-      "name": "Release_wasm",
-      "inherits": "base-wasm",
-      "binaryDir": "${sourceDir}/build/wasm/Release",
+      "name": "Release_wasm32",
+      "inherits": "base-wasm32",
+      "binaryDir": "${sourceDir}/build/wasm32/Release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "USE_WASM_STRIP": "ON"
@@ -82,13 +82,13 @@
   ],
   "buildPresets": [
     {
-      "name": "Debug_wasm",
-      "configurePreset": "Debug_wasm",
+      "name": "Debug_wasm32",
+      "configurePreset": "Debug_wasm32",
       "configuration": "Debug"
     },
     {
-      "name": "Release_wasm",
-      "configurePreset": "Release_wasm",
+      "name": "Release_wasm32",
+      "configurePreset": "Release_wasm32",
       "configuration": "Release"
     },
     {

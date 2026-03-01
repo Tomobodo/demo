@@ -1,4 +1,4 @@
-﻿#include "demo/plasma.hpp"
+﻿#include "plasma.hpp"
 
 #include "engine/color.hpp"
 #include "engine/maths.hpp"

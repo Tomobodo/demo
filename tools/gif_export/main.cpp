@@ -4,41 +4,30 @@
 #include<print>
 #include<string>
 
+#include "engine/demo.hpp"
 #include "engine/color.hpp"
-
-#include "demo/scene_a.hpp"
-#include "demo/plasma.hpp"
-#include "demo/rotoz.hpp"
-
-#include "engine/drawable.hpp"
 
 #include "vendor/msf_gif.h"
 
-DrawFunction drawables[] = {
-   &scene_a,
-   &plasma,
-   &rotoz
-};
-
 int main(const int argc, const char** argv)
 {
-   if (argc < 7)
+   if (argc < 4)
    {
-      std::println(std::cerr, "Usage: gif_export WIDTH HEIGHT FRAMES_COUNT FRAME_RATE QUALITY SCALE");
+      std::println(std::cerr, "Usage: gif_export FRAME_RATE QUALITY SCALE");
       return 1;
    }
 
-   const unsigned int buffer_width = std::stoi(argv[1]);
-   const unsigned int buffer_height = std::stoi(argv[2]);
-   const int frames_count = std::stoi(argv[3]);
-   const int framerate = std::stoi(argv[4]);
-   const int quality = std::stoi(argv[5]);
-   const int scale = std::stoi(argv[6]);
+   demo_init();
 
-   const int gif_buffer_width = buffer_width / scale;
-   const int gif_buffer_height = buffer_height / scale;
+   const int framerate = std::stoi(argv[1]);
+   const int quality = std::stoi(argv[2]);
+   const int scale = std::stoi(argv[3]);
+
+   const int gif_buffer_width = BUFFER_WIDTH / scale;
+   const int gif_buffer_height = BUFFER_HEIGHT / scale;
 
    const auto fps = static_cast<float>(framerate);
+   const int frames_count = static_cast<int>(demo_get_duration() * fps);
 
    const float delta_time = 1.0f / fps;
    const int centiseconds_per_frames = 100 / framerate;
@@ -47,34 +36,17 @@ int main(const int argc, const char** argv)
 
    msf_gif_begin(&gif_state, gif_buffer_width, gif_buffer_height);
 
-   const auto demo_pixels = new unsigned int[buffer_width * buffer_height];
-
-   PixelBuffer demo_buf = {
-      .width = buffer_width,
-      .height = buffer_height,
-      .pixels = demo_pixels
-   };
-
-   const auto total_pixels = buffer_width * buffer_height;
    const auto total_gif_pixels = gif_buffer_width * gif_buffer_height;
    float time = 0;
 
-   const Rect rect = {
-      .x = 0,
-      .y = 0,
-      .w = buffer_width,
-      .h = buffer_height
-   };
-
+   const unsigned int* demo_pixels = demo_get_buffer();
    for (unsigned int i = 0; i < frames_count; ++i)
    {
       auto pixels = new unsigned char[total_gif_pixels * 4];
 
-      const auto scene_index = (i / 250) % 3;
-
-      drawables[scene_index](time, i, rect, demo_buf);
-
       time += delta_time;
+
+      demo_update(time);
 
       for (int y = 0; y < gif_buffer_height; ++y)
       {
@@ -83,7 +55,7 @@ int main(const int argc, const char** argv)
             int pixel_index = x + y * gif_buffer_width;
             auto* gifptr = pixels + pixel_index * 4;
 
-            int demo_pixel_index = (x * scale) + (y * scale) * buffer_width;
+            int demo_pixel_index = (x * scale) + (y * scale) * BUFFER_WIDTH;
 
             const Color col = *(demo_pixels + demo_pixel_index);
             *(gifptr) = col.channels.r;
@@ -100,13 +72,14 @@ int main(const int argc, const char** argv)
       std::println("[{}/{}]", i + 1, frames_count);
    }
 
-   delete[] demo_pixels;
+   demo_deinit();
 
    MsfGifResult result = msf_gif_end(&gif_state);
 
    if (result.data)
    {
-      FILE* fp = fopen("demo.gif", "wb");
+      FILE* fp = nullptr;
+      fopen_s(&fp, "demo.gif", "wb");
       fwrite(result.data, result.dataSize, 1, fp);
       fclose(fp);
       msf_gif_free(result);

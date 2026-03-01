@@ -1,18 +1,10 @@
 ﻿#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include "demo/demo.hpp"
-
-#ifndef BUFFER_WIDTH
-#define BUFFER_WIDTH 640
-#endif
-
-#ifndef BUFFER_HEIGHT
-#define BUFFER_HEIGHT 480
-#endif
+#include "engine/demo.hpp"
 
 #ifdef DEBUG
-#include "debug_tools.hpp"
+#include "../../../include/engine/debug_tools.hpp"
 #endif
 
 
@@ -230,7 +222,7 @@ void entry()
 		}
 #endif
 
-#ifdef DEBUG)
+#ifdef DEBUG
 		update_debug_tool(time);
 #endif
 

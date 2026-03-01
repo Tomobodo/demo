@@ -1,6 +1,6 @@
-﻿#include "demo/scene_b.hpp"
+﻿#include "scene_b.hpp"
+#include "scene_a.hpp"
 
-#include "demo/scene_a.hpp"
 #include "engine/maths.hpp"
 
 unsigned int pixels[BUFFER_WIDTH * BUFFER_HEIGHT];
