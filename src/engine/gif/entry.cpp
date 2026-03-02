@@ -9,6 +9,8 @@
 
 #include "vendor/msf_gif.h"
 
+using namespace engine;
+
 int main(const int argc, const char** argv)
 {
    if (argc < 4)

@@ -7,6 +7,7 @@
 #include "../../../include/engine/debug_tools.hpp"
 #endif
 
+using namespace engine;
 
 constexpr float ASPECT_RATIO = static_cast<float>(BUFFER_WIDTH) / static_cast<float>(BUFFER_HEIGHT);
 

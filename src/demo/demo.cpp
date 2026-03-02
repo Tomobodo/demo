@@ -8,6 +8,8 @@
 #include "engine/maths.hpp"
 #include "engine/pixel_buffer.hpp"
 
+using namespace engine;
+
 constexpr Rect FULL_BUFFER =
 {
     .x = 0,

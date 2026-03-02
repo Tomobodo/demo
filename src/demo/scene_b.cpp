@@ -3,6 +3,8 @@
 
 #include "engine/maths.hpp"
 
+using namespace engine;
+
 unsigned int pixels[BUFFER_WIDTH * BUFFER_HEIGHT];
 
 int wrap(int a, int b)
