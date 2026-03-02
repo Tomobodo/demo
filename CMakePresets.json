@@ -79,6 +79,15 @@
         "USE_CRINKLER": "ON",
         "CMAKE_LINKER": "Crinkler.exe"
       }
+    },
+    {
+      "name": "Release_gif",
+      "binaryDir": "${sourceDir}/build/gif/Release",
+      "inherits": "base-windows-32",
+      "cacheVariables": {
+        "PLATFORM": "gif",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     }
   ],
   "buildPresets": [

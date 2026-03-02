@@ -1,9 +1,12 @@
 ﻿#pragma once
 
-struct Rect
+namespace engine
 {
-    int x;
-    int y;
-    unsigned int w;
-    unsigned int h;
-};
+    struct Rect
+    {
+        int x;
+        int y;
+        unsigned int w;
+        unsigned int h;
+    };
+}

@@ -3,6 +3,8 @@
 #include "engine/color.hpp"
 #include "engine/maths.hpp"
 
+using namespace engine;
+
 constexpr int PALETTE_SIZE = 32;
 constexpr int PALETTE_SIZE_Q = PALETTE_SIZE / 4;
 static unsigned int colors[PALETTE_SIZE];

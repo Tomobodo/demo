@@ -3,6 +3,8 @@
 #include "engine/maths.hpp"
 #include "engine/color.hpp"
 
+using namespace engine;
+
 constexpr Color A = 0xFF1B5ABF, B = 0xFF1349A1, C = 0xFFEB5E13, D = 0xFFBF5A08;
 Color BG_PALETTE[2] = {0, 0};
 

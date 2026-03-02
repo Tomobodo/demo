@@ -1,7 +1,7 @@
 ﻿set(MODULE_NAME ${PROJECT_NAME}_module)
-set(TARGET gif_export)
+set(TARGET gif)
 
-add_executable(${TARGET} main.cpp)
+add_executable(${TARGET} entry.cpp maths.cpp)
 
 target_include_directories(
         ${TARGET} PRIVATE

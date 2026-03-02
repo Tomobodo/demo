@@ -3,6 +3,8 @@
 #include "engine/color.hpp"
 #include "engine/maths.hpp"
 
+using namespace engine;
+
 constexpr Color A = 0xFF1B5ABF, B = 0xFF1349A1, C = 0xFFEB5E13, D = 0xFFBF5A08;
 Color ROTO_PALETTE[2] = {A, B};
 

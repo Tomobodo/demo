@@ -1,9 +1,17 @@
 cmake_minimum_required(VERSION 3.30)
 
+string(TOLOWER "${CMAKE_SYSTEM_NAME}" SYSTEM_NAME)
+
+if (NOT SYSTEM_NAME)
+    string(TOLOWER "${CMAKE_HOST_SYSTEM_NAME}" SYSTEM_NAME)
+endif ()
+
 option(USE_WASM_STRIP "Strip final wasm file" OFF)
 option(USE_CRINKLER "Compress final executable with CRINKLER" OFF)
 option(HOTRELOAD "Enable hot reload" OFF)
 option(SHOW_FPS "Enable fps counter" OFF)
+set(PLATFORM "${SYSTEM_NAME}" CACHE STRING "Target platform, leave empty for host")
+set_property(CACHE PLATFORM PROPERTY STRINGS "windows" "wasm32" "gif")
 
 set(MAX_SIZE 4096 CACHE STRING "Maximum binary size in bytes")
 
@@ -23,13 +31,27 @@ include_directories(
         include
 )
 
-string(TOLOWER "${CMAKE_SYSTEM_NAME}" SYSTEM_NAME)
-
 add_compile_definitions(
         BUFFER_WIDTH=${BUFFER_WIDTH}
         BUFFER_HEIGHT=${BUFFER_HEIGHT}
-        PLATFORM_${SYSTEM_NAME}
+        PLATFORM_${PLATFORM}
         $<$<BOOL:${SHOW_FPS}>:SHOW_FPS>
+)
+
+# Building tools for assets and code generation
+include(ExternalProject)
+
+set(HOST_TOOLS_BINARY_DIR ${CMAKE_SOURCE_DIR}/build/tools)
+set(ASSET_EMBEDDER_EXE ${HOST_TOOLS_BINARY_DIR}/asset_embedder${CMAKE_HOST_EXECUTABLE_SUFFIX})
+
+ExternalProject_Add(
+        host_tools_build
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/tools
+        BINARY_DIR ${HOST_TOOLS_BINARY_DIR}
+        INSTALL_COMMAND ""
+        BUILD_BYPRODUCTS ${ASSET_EMBEDDER_EXE}
+        CMAKE_ARGS
+        -DCMAKE_BUILD_TYPE=Release
 )
 
 add_subdirectory(tools)

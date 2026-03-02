@@ -1,8 +1,11 @@
 ﻿#pragma once
 
-struct PixelBuffer
+namespace engine
 {
-    unsigned int width;
-    unsigned int height;
-    unsigned int* pixels;
-};
+    struct PixelBuffer
+    {
+        unsigned int width;
+        unsigned int height;
+        unsigned int* pixels;
+    };
+}
