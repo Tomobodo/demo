@@ -48,11 +48,17 @@ ExternalProject_Add(
         host_tools_build
         SOURCE_DIR ${CMAKE_SOURCE_DIR}/tools
         BINARY_DIR ${HOST_TOOLS_BINARY_DIR}
+        #        STAMP_DIR ${HOST_TOOLS_BINARY_DIR}/.stamps
         INSTALL_COMMAND ""
         BUILD_BYPRODUCTS ${ASSET_EMBEDDER_EXE}
         CMAKE_ARGS
+        -GNinja
+        -DROOT_SOURCE_DIR=${CMAKE_SOURCE_DIR}
+        -DCMAKE_TOOLCHAIN_FILE=
+        -DCMAKE_SYSTEM_NAME=${CMAKE_HOST_SYSTEM_NAME}
+        -DCMAKE_SYSTEM_PROCESSOR=${CMAKE_HOST_SYSTEM_PROCESSOR}
         -DCMAKE_BUILD_TYPE=Release
 )
 
-add_subdirectory(tools)
+add_subdirectory(tools EXCLUDE_FROM_ALL)
 add_subdirectory(src)

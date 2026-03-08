@@ -5,5 +5,5 @@ target_sources(
         timeline.cpp
         color.cpp
         maths.cpp
+        font.cpp
 )
-

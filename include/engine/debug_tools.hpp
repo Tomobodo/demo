@@ -8,7 +8,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 namespace engine
 {
-    void init_debug_tool(HINSTANCE hinstance, float demo_duration, float* time);
+    void init_debug_tool(HINSTANCE hinstance, float demo_duration, float* time, bool* paused);
 
     void update_debug_tool(float time);
 }

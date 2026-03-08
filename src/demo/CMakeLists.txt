@@ -9,21 +9,23 @@ target_sources(
         rotoz.cpp
         demo.cpp
         plasma.cpp
+        draw_text.cpp
 )
 
 set(GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
 file(MAKE_DIRECTORY ${GENERATED_DIR})
 
-set(ASSET_INPUT_FILE ${CMAKE_SOURCE_DIR}/assets/fonts/thick_8x8.png)
-set(ASSET_OUTPUT_HEADER ${GENERATED_DIR}/thick_8x8_font.hpp)
+set(ASSET_INPUT_DIR ${CMAKE_SOURCE_DIR}/assets)
+set(ASSET_OUTPUT_HEADER ${GENERATED_DIR}/assets.hpp)
 
 add_custom_command(
         OUTPUT ${ASSET_OUTPUT_HEADER}
         COMMAND ${ASSET_EMBEDDER_EXE}
-        ${ASSET_INPUT_FILE}
+        ${CMAKE_SOURCE_DIR}
+        ${ASSET_INPUT_DIR}
         ${ASSET_OUTPUT_HEADER}
         DEPENDS ${ASSET_EMBEDDER_EXE}
-        ${ASSET_INPUT_FILE}
+        ${ASSET_INPUT_DIR}
         COMMENT "Embedding assets..."
         VERBATIM
 )

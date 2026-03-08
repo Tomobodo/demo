@@ -7,8 +7,6 @@
 #include "../../../include/engine/debug_tools.hpp"
 #endif
 
-using namespace engine;
-
 constexpr float ASPECT_RATIO = static_cast<float>(BUFFER_WIDTH) / static_cast<float>(BUFFER_HEIGHT);
 
 void update_window_size(const HWND& window_handle, bool fullscreen)
@@ -186,7 +184,8 @@ void entry()
 	float time = 0;
 
 #if defined(DEBUG)
-	init_debug_tool(hinstance, get_duration(), &time);
+	bool paused = false;
+	engine::init_debug_tool(hinstance, get_duration(), &time, &paused);
 #endif
 
 	RECT rc;
@@ -208,7 +207,10 @@ void entry()
 		float delta = static_cast<float>(t_end.LowPart - t_start.LowPart) / static_cast<float>(
 			frequency);
 
-		time += delta;
+#ifdef DEBUG
+		if (!paused)
+#endif
+			time += delta;
 
 		t_start = t_end;
 
@@ -224,7 +226,7 @@ void entry()
 #endif
 
 #ifdef DEBUG
-		update_debug_tool(time);
+		engine::update_debug_tool(time);
 #endif
 
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
