@@ -3,6 +3,7 @@
 #include "scene_b.hpp"
 #include "rotoz.hpp"
 #include "plasma.hpp"
+#include "draw_text.hpp"
 
 #include "engine/timeline.hpp"
 #include "engine/maths.hpp"
@@ -46,6 +47,11 @@ constexpr Clip clips[] = {
         .start_time = 15.0f,
         .duration = 5.0f,
         .drawable = &rotoz
+    },
+    {
+        .start_time = 0.0f,
+        .duration = 20.0f,
+        .drawable = &draw_text
     }
 };
 

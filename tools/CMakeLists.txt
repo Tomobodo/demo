@@ -8,5 +8,9 @@ project(
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if (NOT ROOT_SOURCE_DIR)
+    set(ROOT_SOURCE_DIR ${CMAKE_SOURCE_DIR})
+endif ()
+
 add_subdirectory(asset_embedder)
 

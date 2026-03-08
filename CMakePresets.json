@@ -18,14 +18,13 @@
       "name": "base-windows-32",
       "hidden": true,
       "generator": "Ninja",
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      },
       "cacheVariables": {
         "CMAKE_CXX_COMPILER": "cl.exe",
         "CMAKE_CXX_COMPILER_WORKS": "TRUE"
-      },
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "Visual Studio x86"
-        }
       }
     },
     {
