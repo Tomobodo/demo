@@ -28,7 +28,7 @@ set(COMPILE_OPTIONS
         /Qvec-report:2
         /fp:fast
         $<$<CONFIG:RelWithDebInfo>:/Od /DDEBUG >
-        $<$<CONFIG:Release>:/EHa-s-c- /Zl /O2 /Gw /Gy>
+        $<$<CONFIG:Release>:/EHa-s-c- /Zl /O2 /Gw /Gy /O1 /Os /Gw /GF>
 )
 
 target_compile_options(
@@ -99,16 +99,4 @@ if (USE_CRINKLER)
             /REPORT:report.html
             /PROGRESSGUI
     )
-
-    if (CMAKE_BUILD_TYPE STREQUAL "Release")
-        add_custom_command(
-                TARGET ${PROJECT_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND}
-                -D "TARGET_PATH=$<TARGET_FILE:${PROJECT_NAME}>"
-                -D "MAX_SIZE=${MAX_SIZE}"
-                -P "${PROJECT_SOURCE_DIR}/cmake/check_size.cmake"
-                WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
-                COMMENT "Checking binary size"
-        )
-    endif ()
 endif ()

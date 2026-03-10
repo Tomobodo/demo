@@ -10,6 +10,7 @@ target_sources(
         demo.cpp
         plasma.cpp
         draw_text.cpp
+        segment_sdf.cpp
 )
 
 set(GENERATED_DIR ${CMAKE_BINARY_DIR}/generated)
