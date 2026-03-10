@@ -19,4 +19,12 @@ namespace engine
     float fast_cos(float angle);
 
     float lerp(float a, float b, float t);
+
+    float sqrt(float x);
+
+    float min(float x1, float x2);
+
+    float max(float x1, float x2);
+
+    float clamp(float v, float min, float max);
 }
