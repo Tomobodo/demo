@@ -4,13 +4,8 @@ namespace engine
 {
     FontGlyph font_get_glyph(const Font& font, const char c)
     {
-        for (int i = 0; i < font.length; ++i)
-        {
-            FontGlyph glyph = font.glyphs[i];
-            if (glyph.id == c)
-                return glyph;
-        }
-
+        if (c >= 0 && c < font.length)
+            return font.glyphs[c - 1];
         return font.glyphs[0];
     }
 }

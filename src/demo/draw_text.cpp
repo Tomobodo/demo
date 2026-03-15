@@ -9,18 +9,19 @@
 
 void draw_text(float time, unsigned int frame, const engine::Rect& src_rect, const engine::PixelBuffer* dst_buf)
 {
-    const char* text =
-        "Hello, world! Here's some scrolling text costing me 25% of my whole byte budget ! Was it worth it ???";
+    const char* text = convert_string_to_assets_fonts_thick_8x8(
+        "Hello, world!");
 
     int i = 0;
     int advance = 0;
-    while (text[i] != '\0')
+    int font_width = assets_fonts_thick_8x8.width;
+    while (text[i] != 0)
     {
         auto glyph = engine::font_get_glyph(assets_fonts_thick_8x8, text[i]);
 
         for (int y = 0; y < 8; y++)
         {
-            for (int x = advance; x < glyph.width + advance; ++x)
+            for (int x = advance; x < font_width + advance; ++x)
             {
                 if (x > dst_buf->width) break;
                 int buff_index = y * dst_buf->width + x;
@@ -29,7 +30,7 @@ void draw_text(float time, unsigned int frame, const engine::Rect& src_rect, con
             }
         }
 
-        advance += glyph.width;
+        advance += font_width;
         i++;
     }
 }

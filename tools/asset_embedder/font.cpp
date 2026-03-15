@@ -116,14 +116,11 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
     }
 
     std::vector<unsigned char> bit_font_data;
-    int bit_font_data_start_index = glyphs[0].id;
     std::vector<engine::FontGlyph> final_font_glyphs(glyphs.size());
 
     for (const auto& [i, glyph] : std::views::enumerate(glyphs))
     {
-        engine::FontGlyph& g = final_font_glyphs[i];
-        g.id = glyph.id;
-        g.width = glyph.advance;
+        auto& [bitmap] = final_font_glyphs[i];
 
         const auto page = pages[glyph.page];
         for (int y = glyph.y; y < glyph.y + 8; ++y)
@@ -137,7 +134,7 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
                     line_value |= static_cast<unsigned char>(128) >> (x - glyph.x);
             }
             bit_font_data.push_back(line_value);
-            g.bitmap[y - glyph.y] = line_value;
+            bitmap[y - glyph.y] = line_value;
         }
     }
 
@@ -146,7 +143,7 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
 
     engine::Font font = {
         .glyphs = final_font_glyphs.data(),
-        .start_index = static_cast<unsigned char>(bit_font_data_start_index),
+        .width = static_cast<unsigned char>(glyphs.begin()->width),
         .length = static_cast<unsigned char>(glyphs.size())
     };
 
@@ -161,7 +158,7 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
             std::string s = std::format("{:08b}", line_value);
             std::ranges::replace(s, '1', '$');
             std::ranges::replace(s, '0', ' ');
-            s = s.substr(0, g.width);
+            s = s.substr(0, font.width);
             std::print("{}", s);
         }
 
@@ -179,20 +176,42 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
     generated_code << "constexpr engine::FontGlyph " << glyphs_variable << "[] = {" << std::endl;
     for (const auto& glyph : final_font_glyphs)
     {
-        generated_code << "\t{" << std::endl;
-        generated_code << "\t\t.bitmap = {";
+        generated_code << "\t{";
         for (const unsigned char& c : glyph.bitmap)
             generated_code << static_cast<int>(c) << ",";
-        generated_code << "}," << std::endl;
-        generated_code << "\t\t.id = " << static_cast<int>(glyph.id) << "," << std::endl;
-        generated_code << "\t\t.width = " << static_cast<int>(glyph.width) << std::endl;
         generated_code << "\t}," << std::endl;
     }
 
-    generated_code << "};" << std::endl;
-    generated_code << "constexpr engine::Font " << font_variable << " = {" << std::endl;
-    generated_code << "\t.glyphs = " << glyphs_variable << "," << std::endl;
-    generated_code << "\t.start_index = " << static_cast<int>(font.start_index) << ", " << std::endl;
-    generated_code << "\t.length = " << static_cast<int>(font.length) << std::endl;
-    generated_code << "};" << std::endl;
+    generated_code << "};" << std::endl << std::endl
+        << "constexpr engine::Font " << font_variable << " = {" << std::endl
+        << "\t.glyphs = " << glyphs_variable << "," << std::endl
+        << "\t.width = " << static_cast<int>(font.width) << "," << std::endl
+        << "\t.length = " << static_cast<int>(font.length) << std::endl
+        << "};" << std::endl;
+
+    // string conversion
+    generated_code << std::endl
+        << "template<size_t N>" << std::endl
+        << "constexpr auto convert_string_to_" << font_variable << "(const char (&str)[N]) {" << std::endl
+        << "\tchar conversion_table[128] = {0};" << std::endl;
+
+    for (int i = 0; i < 128; ++i)
+    {
+        for (const auto& [j, glyph] : std::views::enumerate(glyphs))
+        {
+            if (glyph.id == i)
+                generated_code << "\tconversion_table[" << i << "] = "
+                    << j + 1 << ";" << std::endl;
+        }
+    }
+
+    generated_code << std::endl
+        << "\tchar result[N]{0};" << std::endl;
+
+    generated_code << "\tint i = 0;" << std::endl
+        << "\tfor(size_t i = 0; i < N; ++i) {" << std::endl
+        << "\t\tresult[i] = conversion_table[str[i]];" << std::endl
+        << "\t}" << std::endl
+        << "\treturn result;" << std::endl
+        << "}" << std::endl;
 }
