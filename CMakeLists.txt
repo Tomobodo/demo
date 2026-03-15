@@ -50,6 +50,7 @@ ExternalProject_Add(
         BINARY_DIR ${HOST_TOOLS_BINARY_DIR}
         #        STAMP_DIR ${HOST_TOOLS_BINARY_DIR}/.stamps
         INSTALL_COMMAND ""
+        BUILD_ALWAYS TRUE
         BUILD_BYPRODUCTS ${ASSET_EMBEDDER_EXE}
         CMAKE_ARGS
         -GNinja

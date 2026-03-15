@@ -210,8 +210,8 @@ void entry()
 #ifdef DEBUG
 		if (!paused)
 #endif
-			time += delta;
 
+		time += delta;
 		t_start = t_end;
 
 #if defined(DEBUG) || defined(SHOW_FPS)

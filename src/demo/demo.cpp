@@ -4,7 +4,6 @@
 #include "rotoz.hpp"
 #include "plasma.hpp"
 #include "draw_text.hpp"
-#include "segment_sdf.hpp"
 
 #include "engine/timeline.hpp"
 #include "engine/maths.hpp"
@@ -53,11 +52,6 @@ constexpr Clip clips[] = {
         .start_time = 0.0f,
         .duration = 20.0f,
         .drawable = &draw_text
-    },
-    {
-        .start_time = 20.0f,
-        .duration = 30.0f,
-        .drawable = &segment_sdf
     }
 };
 
