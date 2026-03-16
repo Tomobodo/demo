@@ -1,10 +1,13 @@
 ﻿set(TARGET asset_embedder)
+
 add_executable(${TARGET})
 
 target_sources(
         ${TARGET} PRIVATE
         main.cpp
+        stb.cpp
         font.cpp
+        palette.cpp
         ${ROOT_SOURCE_DIR}/src/engine/font.cpp
 )
 

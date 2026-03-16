@@ -1,13 +1,16 @@
 ﻿#include <filesystem>
 #include <iostream>
+#include <memory>
 #include <print>
-#include <unordered_map>
+#include <sstream>
 #include <string_view>
 #include <set>
 #include <fstream>
+#include <vector>
 
-#include "pugixml.hpp"
+#include "asset_embedder.hpp"
 #include "font.hpp"
+#include "palette.hpp"
 
 namespace fs = std::filesystem;
 
@@ -37,10 +40,9 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    std::unordered_map<std::string_view, void (*)(const fs::path&, pugi::xml_node&, std::set<std::string_view>&,
-                                                  std::stringstream&)>
-        parsers_map;
-    parsers_map["font"] = &parse_font;
+    std::vector<std::unique_ptr<AssetEmbedder>> embedders;
+    embedders.push_back(std::make_unique<FontEmbedder>());
+    embedders.push_back(std::make_unique<PaletteEmbedder>());
 
     std::set<std::string_view> includes;
     std::stringstream generated_code;
@@ -50,30 +52,16 @@ int main(int argc, char** argv)
         if (fs::is_regular_file(entry))
         {
             const auto& file_path = entry.path();
-            if (file_path.extension() != ".xml")
-                continue;
-
-            std::println("Embedding {}...", entry.path().string());
-
-            pugi::xml_document doc;
-            pugi::xml_parse_result result = doc.load_file(file_path.c_str());
-            if (!result)
+            for (const auto& embedder : embedders)
             {
-                std::println(std::cerr, "Error parsing {}", file_path.string());
-                continue;
+                if (embedder->can_process_file(file_path))
+                {
+                    std::println("Embedding asset {}", file_path.string());
+                    embedder->embed_file(file_path, includes, generated_code);
+                    generated_code << std::endl;
+                    break;
+                }
             }
-
-            auto root_node = doc.first_child();
-            const auto root_tag = root_node.name();
-            const auto it = parsers_map.find(root_tag);
-
-            if (it == parsers_map.end())
-            {
-                std::println("No parser for {}, ignoring...", file_path.string());
-                continue;
-            }
-
-            it->second(file_path, root_node, includes, generated_code);
         }
     }
 
