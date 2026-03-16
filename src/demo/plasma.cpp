@@ -1,43 +1,16 @@
 ﻿#include "plasma.hpp"
 
-#include "engine/color.hpp"
 #include "engine/maths.hpp"
+#include "assets.hpp"
+#include "engine/color.hpp"
 
 using namespace engine;
 
-constexpr int PALETTE_SIZE = 32;
-constexpr int PALETTE_SIZE_Q = PALETTE_SIZE / 4;
-static unsigned int colors[PALETTE_SIZE];
-
-bool palette_computed = false;
-
-void compute_palette()
-{
-    if (palette_computed) return;
-
-    for (unsigned int i = 0; i < PALETTE_SIZE; i++)
-    {
-        if (i < PALETTE_SIZE_Q)
-            colors[i] = lerp_color(0xFF330000, 0xFFCC8800, static_cast<float>(i) / PALETTE_SIZE_Q);
-        else if (i < 2 * PALETTE_SIZE_Q)
-            colors[i] = lerp_color(0xFFCC8800, 0xFFFFFFFF, static_cast<float>(i - PALETTE_SIZE_Q) / PALETTE_SIZE_Q);
-        else if (i < 3 * PALETTE_SIZE_Q)
-            colors[i] = lerp_color(0xFFFFFFFF, 0xFF0088CC, static_cast<float>(i - 2 * PALETTE_SIZE_Q) / PALETTE_SIZE_Q);
-        else
-            colors[i] = lerp_color(0xFF0088CC, 0xFF000033, static_cast<float>(i - 3 * PALETTE_SIZE_Q) / PALETTE_SIZE_Q);
-    }
-
-
-    palette_computed = true;
-}
-
 unsigned int get_color(float v)
 {
-    compute_palette();
+    const int index = static_cast<int>(v * assets_plasma_palette_size);
 
-    const int index = static_cast<int>(v * PALETTE_SIZE);
-
-    return colors[index];
+    return Color(assets_plasma_palette[index]);
 }
 
 void plasma(float time, const unsigned int frame, const Rect& src_rect, const PixelBuffer* dst_buf)

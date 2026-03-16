@@ -9,12 +9,13 @@
 
 void draw_text(float time, unsigned int frame, const engine::Rect& src_rect, const engine::PixelBuffer* dst_buf)
 {
-    const char* text = convert_string_to_assets_fonts_thick_8x8(
-        "Hello, world!");
+    const char* text = assets_fonts_thick_8x8_remap(
+        "This demo is four kilobytes of human stubbornness..."
+    );
 
     int i = 0;
     int advance = 0;
-    int font_width = assets_fonts_thick_8x8.width;
+    constexpr int font_width = assets_fonts_thick_8x8.width;
     while (text[i] != 0)
     {
         auto glyph = engine::font_get_glyph(assets_fonts_thick_8x8, text[i]);

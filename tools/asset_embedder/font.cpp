@@ -1,13 +1,17 @@
 ﻿#include "font.hpp"
+#include <algorithm>
 #include <print>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <ranges>
+#include <cstring>
 
 #include "engine/font.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "vendor/stb_image.h"
+
+namespace fs = std::filesystem;
 
 void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string_view>& includes,
                 std::stringstream& generated_code)
@@ -118,8 +122,9 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
     std::vector<unsigned char> bit_font_data;
     std::vector<engine::FontGlyph> final_font_glyphs(glyphs.size());
 
-    for (const auto& [i, glyph] : std::views::enumerate(glyphs))
+    for (int i = 0; i < glyphs.size(); ++i)
     {
+        const auto& glyph = glyphs[i];
         auto& [bitmap] = final_font_glyphs[i];
 
         const auto page = pages[glyph.page];
@@ -191,14 +196,15 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
 
     // string conversion
     generated_code << std::endl
-        << "template<size_t N>" << std::endl
-        << "constexpr auto convert_string_to_" << font_variable << "(const char (&str)[N]) {" << std::endl
+        << "template<unsigned int N>" << std::endl
+        << "constexpr auto " << font_variable << "_remap(const char (&str)[N]) {" << std::endl
         << "\tchar conversion_table[128] = {0};" << std::endl;
 
     for (int i = 0; i < 128; ++i)
     {
-        for (const auto& [j, glyph] : std::views::enumerate(glyphs))
+        for (int j = 0; j < glyphs.size(); ++j)
         {
+            const auto& glyph = glyphs[j];
             if (glyph.id == i)
                 generated_code << "\tconversion_table[" << i << "] = "
                     << j + 1 << ";" << std::endl;
@@ -209,9 +215,45 @@ void parse_font(const fs::path& path, pugi::xml_node& root, std::set<std::string
         << "\tchar result[N]{0};" << std::endl;
 
     generated_code << "\tint i = 0;" << std::endl
-        << "\tfor(size_t i = 0; i < N; ++i) {" << std::endl
+        << "\tfor(unsigned int i = 0; i < N; ++i) {" << std::endl
         << "\t\tresult[i] = conversion_table[str[i]];" << std::endl
         << "\t}" << std::endl
         << "\treturn result;" << std::endl
         << "}" << std::endl;
+}
+
+bool FontEmbedder::can_process_file(const std::filesystem::path& file_path)
+{
+    if (file_path.extension() != ".xml")
+        return false;
+
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_file(file_path.c_str());
+    if (!result)
+    {
+        std::println(std::cerr, "Error parsing {}", file_path.string());
+        return false;
+    }
+
+    auto root_node = doc.first_child();
+    const auto root_tag = root_node.name();
+    if (strcmp(root_tag, "font") == 0)
+        return true;
+
+    return false;
+}
+
+void FontEmbedder::embed_file(const std::filesystem::path& file_path, std::set<std::string_view>& includes,
+                              std::stringstream& generated_code)
+{
+    pugi::xml_document doc;
+    pugi::xml_parse_result result = doc.load_file(file_path.c_str());
+    if (!result)
+    {
+        std::println(std::cerr, "Error parsing {}", file_path.string());
+        return;
+    }
+
+    auto root_node = doc.first_child();
+    parse_font(file_path, root_node, includes, generated_code);
 }

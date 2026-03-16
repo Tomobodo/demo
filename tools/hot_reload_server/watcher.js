@@ -70,7 +70,7 @@ function build(path) {
 
     const preset_name = "Debug_wasm32"
 
-    const build = spawn('cmake', ['--build', '--preset', preset_name], {stdio: 'inherit'})
+    const build = spawn('cmake', ['--build', '--preset', preset_name, "--target", "demo"], {stdio: 'inherit'})
 
     build.on('close', (code) => {
         if (code === 0) {

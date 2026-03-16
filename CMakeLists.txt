@@ -61,5 +61,7 @@ ExternalProject_Add(
         -DCMAKE_BUILD_TYPE=Release
 )
 
-add_subdirectory(tools EXCLUDE_FROM_ALL)
+if (NOT CMAKE_CROSSCOMPILING)
+    add_subdirectory(tools EXCLUDE_FROM_ALL)
+endif ()
 add_subdirectory(src)
