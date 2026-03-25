@@ -1,30 +1,33 @@
 ﻿#pragma once
 
-namespace engine
-{
-    constexpr float PI = 3.1415926f;
-    constexpr float THETA = PI * 2.0f;
+namespace engine {
+constexpr float PI = 3.1415926f;
+constexpr float THETA = PI * 2.0f;
 
-    extern "C" int __cdecl abs(int);
+#ifdef _MSV_VER
+extern "C" int __cdecl abs(int);
 #pragma intrinsic(abs)
+#else
+int abs(int x);
+#endif
 
-    float sin(float angle);
+float sin(float angle);
 
-    float cos(float angle);
+float cos(float angle);
 
-    void init_sin_lut();
+void init_sin_lut();
 
-    float fast_sin(float angle);
+float fast_sin(float angle);
 
-    float fast_cos(float angle);
+float fast_cos(float angle);
 
-    float lerp(float a, float b, float t);
+float lerp(float a, float b, float t);
 
-    float sqrt(float x);
+float sqrt(float x);
 
-    float min(float x1, float x2);
+float min(float x1, float x2);
 
-    float max(float x1, float x2);
+float max(float x1, float x2);
 
-    float clamp(float v, float min, float max);
-}
+float clamp(float v, float min, float max);
+} // namespace engine
