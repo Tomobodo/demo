@@ -28,6 +28,7 @@ target_compile_options(
 
 target_sources(
   ${PROJECT_NAME} PRIVATE
+  entry.s
   entry.cpp
 )
 
@@ -50,5 +51,4 @@ target_link_libraries(
   ${PROJECT_NAME} PRIVATE
   ${PROJECT_NAME}_module
   X11
-  c
 )

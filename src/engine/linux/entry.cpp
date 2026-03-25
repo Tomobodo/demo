@@ -1,14 +1,16 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
-#include <stdlib.h>
-#include <time.h>
 
 #include "engine/demo.hpp"
 
-static long get_time_ns() {
+extern "C" [[noreturn]] void sys_exit(int code);
+
+extern "C" int sys_clock_gettime(long clock_id, timespec *ts);
+
+long get_time_ns() {
   timespec ts;
-  clock_gettime(CLOCK_MONOTONIC, &ts);
+  sys_clock_gettime(1, &ts);
   return ts.tv_sec * 1000000000L + ts.tv_nsec;
 }
 
@@ -64,5 +66,5 @@ __attribute__((force_align_arg_pointer)) extern "C" void entry() {
 
   demo_deinit();
 
-  exit(0);
+  sys_exit(0);
 }
