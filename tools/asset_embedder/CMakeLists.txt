@@ -13,7 +13,7 @@ target_sources(
 
 set_target_properties(
         ${TARGET} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
+        RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin
 )
 
 add_subdirectory(${ROOT_SOURCE_DIR}/external/pugixml pugixml)

@@ -10,7 +10,12 @@ option(USE_WASM_STRIP "Strip final wasm file" OFF)
 option(USE_CRINKLER "Compress final executable with CRINKLER" OFF)
 option(HOTRELOAD "Enable hot reload" OFF)
 option(SHOW_FPS "Enable fps counter" OFF)
-set(PLATFORM "${SYSTEM_NAME}" CACHE STRING "Target platform, leave empty for host")
+set(
+  PLATFORM
+  "${SYSTEM_NAME}"
+  CACHE STRING
+  "Target platform, leave empty for host"
+)
 set_property(CACHE PLATFORM PROPERTY STRINGS "windows" "wasm32" "gif")
 
 set(MAX_SIZE 4096 CACHE STRING "Maximum binary size in bytes")
@@ -21,7 +26,7 @@ set(BUFFER_HEIGHT 480 CACHE STRING "Buffer height")
 project(
         demo
         VERSION 0.2.0
-        LANGUAGES CXX
+        LANGUAGES CXX ASM
 )
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,7 +47,10 @@ add_compile_definitions(
 include(ExternalProject)
 
 set(HOST_TOOLS_BINARY_DIR ${CMAKE_SOURCE_DIR}/build/tools)
-set(ASSET_EMBEDDER_EXE ${HOST_TOOLS_BINARY_DIR}/asset_embedder${CMAKE_HOST_EXECUTABLE_SUFFIX})
+set(
+  ASSET_EMBEDDER_EXE
+  ${HOST_TOOLS_BINARY_DIR}/bin/asset_embedder${CMAKE_HOST_EXECUTABLE_SUFFIX}
+)
 
 ExternalProject_Add(
         host_tools_build
@@ -64,4 +72,5 @@ ExternalProject_Add(
 if (NOT CMAKE_CROSSCOMPILING)
     add_subdirectory(tools EXCLUDE_FROM_ALL)
 endif ()
+
 add_subdirectory(src)
