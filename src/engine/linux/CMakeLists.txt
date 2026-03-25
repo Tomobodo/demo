@@ -5,21 +5,29 @@ set_target_properties(
   RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
 )
 
-target_link_options(
-  ${PROJECT_NAME} PRIVATE
-  -nostdlib
-  -Wl,-e,entry
+
+set(COMPILE_OPTIONS
+  -fno-exceptions
+  -fno-stack-protector
+  $<$<CONFIG:Release>:-Oz>
+  $<$<CONFIG:Release>:-ffunction-sections>
+  $<$<CONFIG:Release>:-fdata-sections>
+  $<$<CONFIG:Release>:-fno-asynchronous-unwind-tables>
+  $<$<CONFIG:Release>:-fno-unwind-tables>
 )
 
 target_compile_options(
   ${PROJECT_NAME}_module PRIVATE
-  -fno-exceptions
-  -fno-stack-protector
+  ${COMPILE_OPTIONS}
+)
+
+target_compile_options(
+  ${PROJECT_NAME} PRIVATE
+  ${COMPILE_OPTIONS}
 )
 
 target_sources(
   ${PROJECT_NAME} PRIVATE
-  entry.s
   entry.cpp
 )
 
@@ -29,7 +37,18 @@ target_sources(
   maths.cpp
 )
 
+target_link_options(
+  ${PROJECT_NAME} PRIVATE
+  -nostdlib
+  -Wl,-e,entry
+  $<$<CONFIG:Release>:-Wl,--strip-all>
+  $<$<CONFIG:Release>:-Wl,--gc-sections>
+  $<$<CONFIG:Release>:-Wl,--discard-all>
+)
+
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE
   ${PROJECT_NAME}_module
+  X11
+  c
 )

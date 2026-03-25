@@ -67,6 +67,14 @@
       }
     },
     {
+      "name": "Release_linux",
+      "inherits": "base-linux",
+      "binaryDir": "${sourceDir}/build/linux/Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "name": "Release_wasm32",
       "inherits": "base-wasm32",
       "binaryDir": "${sourceDir}/build/wasm32/Release",
@@ -117,6 +125,11 @@
       "name": "Debug_linux",
       "configurePreset": "Debug_linux",
       "configuration": "Debug"
+    },
+    {
+      "name": "Release_linux",
+      "configurePreset": "Release_linux",
+      "configuration": "Release"
     },
     {
       "name": "Debug_windows",
