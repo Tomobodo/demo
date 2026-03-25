@@ -52,3 +52,10 @@ target_link_libraries(
   ${PROJECT_NAME}_module
   X11
 )
+
+if (CMAKE_BUILD_TYPE STREQUAL "Release")
+add_custom_command(
+  TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND sstrip $<TARGET_FILE:${PROJECT_NAME}>
+)
+endif()
