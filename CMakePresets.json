@@ -28,6 +28,18 @@
       }
     },
     {
+      "name": "cross-windows",
+      "displayName": "Windows x86 (Crinkler)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/cross-windows",
+      "toolchainFile": "${sourceDir}/cmake/toolchain-windows-crinkler.cmake",
+      "cacheVariables": {
+        "PLATFORM": "windows",
+        "CMAKE_BUILD_TYPE": "Release",
+        "USE_CRINKLER": "ON"
+      }
+    },
+    {
       "name": "base-linux",
       "hidden": true,
       "generator": "Ninja"
@@ -120,6 +132,10 @@
       "name": "Release_wasm32",
       "configurePreset": "Release_wasm32",
       "configuration": "Release"
+    },
+    {
+      "name": "cross-windows",
+      "configurePreset": "cross-windows"
     },
     {
       "name": "Debug_linux",

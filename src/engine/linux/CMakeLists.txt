@@ -5,7 +5,6 @@ set_target_properties(
   RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}
 )
 
-
 set(COMPILE_OPTIONS
   -fno-exceptions
   -fno-stack-protector
