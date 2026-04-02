@@ -1,6 +1,4 @@
-﻿#include <new>
-
-#include "engine/demo.hpp"
+﻿#include "engine/demo.hpp"
 #include "engine/maths.hpp"
 #include "engine/pixel_buffer.hpp"
 #include "engine/timeline.hpp"
@@ -13,38 +11,38 @@
 
 using namespace engine;
 
-constexpr Rect FULL_BUFFER = {
-    .x = 0, .y = 0, .w = BUFFER_WIDTH, .h = BUFFER_HEIGHT};
-
 alignas(16) unsigned int main_buffer[BUFFER_WIDTH * BUFFER_HEIGHT] = {0};
 
 PixelBuffer pixel_buffer{
     .width = BUFFER_WIDTH, .height = BUFFER_HEIGHT, .pixels = main_buffer};
 
 constexpr Clip clips[] = {
-    {.start_time = 0, .duration = 5.0f, .drawable = &scene_a},
-    {.start_time = 5.0f, .duration = 5.0f, .drawable = &plasma},
-    {.start_time = 10.0f, .duration = 5.0f, .drawable = &scene_b},
-    {.start_time = 15.0f, .duration = 5.0f, .drawable = &rotoz},
-    {.start_time = 0.0f, .duration = 20.0f, .drawable = &draw_text}};
+    {.start_time = 0, .duration = 10.0f, .drawable = &scene_a},
+    {.start_time = 10.0f, .duration = 10.0f, .drawable = &plasma},
+    {.start_time = 20.0f, .duration = 10.0f, .drawable = &scene_b},
+    {.start_time = 30.0f, .duration = 10.0f, .drawable = &rotoz},
+    {.start_time = 40.0f, .duration = 8.0f, .drawable = &plasma},
+    {.start_time = 0.0f,
+     .duration = 55.0f,
+     .drawable = &draw_text,
+     .init = &generate_atlas}};
 
-alignas(Timeline) static unsigned char timeline_storage[sizeof(Timeline)];
-Timeline *timeline;
+Timeline timeline;
 
 void demo_init() {
   init_sin_lut();
-  timeline = new (timeline_storage) Timeline(clips, &pixel_buffer);
+  timeline.init(clips, &pixel_buffer);
 }
 
-void demo_deinit() { timeline->~Timeline(); }
+void demo_deinit() { timeline.deinit(); }
 
 void demo_update(const float time) {
   static unsigned int frame = 0;
   frame++;
 
-  timeline->render(time, frame);
+  timeline.render(time, frame);
 }
 
 unsigned int *demo_get_buffer() { return main_buffer; }
 
-float demo_get_duration() { return timeline->duration(); }
+float demo_get_duration() { return timeline.duration(); }

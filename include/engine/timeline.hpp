@@ -2,43 +2,42 @@
 
 #include "engine/drawable.hpp"
 
-namespace engine
-{
-    struct Clip
-    {
-        float start_time;
-        float duration;
-        DrawFunction drawable;
-        void* drawable_options;
-    };
+namespace engine {
+struct Clip {
+  float start_time;
+  float duration;
+  DrawFunction drawable;
+  InitFunction init;
+  void *drawable_options;
+};
 
-    class Timeline
-    {
-    public:
-        template <int N>
-        Timeline(const Clip (&clips)[N], PixelBuffer* target_buffer) : m_src_rect(
-            {
-                .x = 0,
-                .y = 0,
-                .w = target_buffer->width,
-                .h = target_buffer->height
-            }
-        )
-        {
-            m_clips = clips;
-            m_clips_count = N;
-            m_target_buffer = target_buffer;
-        }
+class Timeline {
+public:
+  template <int N>
+  void init(const Clip (&clips)[N], PixelBuffer *target_buffer) {
+    m_clips = clips;
+    m_clips_count = N;
+    m_target_buffer = target_buffer;
+    m_src_rect.x = 0;
+    m_src_rect.y = 0;
+    m_src_rect.w = target_buffer->width;
+    m_src_rect.h = target_buffer->height;
 
-        ~Timeline() = default;
+    for (const auto &clip : clips) {
+      if (clip.init != nullptr)
+        clip.init();
+    }
+  };
 
-        void render(float time, unsigned int frame) const;
-        [[nodiscard]] float duration() const;
+  void deinit();
 
-    private:
-        PixelBuffer* m_target_buffer;
-        const Clip* m_clips;
-        unsigned int m_clips_count;
-        const Rect m_src_rect;
-    };
-}
+  void render(float time, unsigned int frame) const;
+  [[nodiscard]] float duration() const;
+
+private:
+  PixelBuffer *m_target_buffer;
+  const Clip *m_clips;
+  unsigned int m_clips_count;
+  Rect m_src_rect;
+};
+} // namespace engine

@@ -115,7 +115,7 @@
     {
       "name": "Release_gif",
       "binaryDir": "${sourceDir}/build/gif/Release",
-      "inherits": "base-windows-32",
+      "generator": "Ninja",
       "cacheVariables": {
         "PLATFORM": "gif",
         "CMAKE_BUILD_TYPE": "Release"
@@ -165,6 +165,11 @@
     {
       "name": "Release_windows_crinkler",
       "configurePreset": "Release_windows_crinkler",
+      "configuration": "Release"
+    },
+    {
+      "name": "Release_gif",
+      "configurePreset": "Release_gif",
       "configuration": "Release"
     }
   ]
