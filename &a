@@ -81,15 +81,17 @@ void draw_atlas_cell(const engine::PixelBuffer *dst_buf, int x, int y,
       auto atlas_index = cell_x + cell_y * atlas_width;
       auto atlas_val = atlas[atlas_index];
 
+      float a = engine::fast_sin(static_cast<float>(x) / 100.f) * 0.04f;
+
       if (atlas_val > 20)
         dst_buf->pixels[buf_index] = engine::Color(1.f, 0, 0, 0);
 
       if (atlas_val > 35)
         dst_buf->pixels[buf_index] = engine::Color(
             1.f,
-            engine::fast_sin((x * 0.002f + time * 3.f) * 0.78f) * 0.35f + 0.65f,
-            engine::fast_sin((x * 0.002f + time * 3.f) * 1.32f) * 0.35f + 0.65f,
-            engine::fast_sin((x * 0.002f + time * 3.f) * 1.9746f) * 0.35f +
+            engine::fast_sin((x * 0.005f + time * 3.f) * 0.78f) * 0.35f + 0.65f,
+            engine::fast_sin((x * 0.005f + time * 3.f) * 1.32f) * 0.35f + 0.65f,
+            engine::fast_sin((x * 0.005f + time * 3.f) * 1.9746f) * 0.35f +
                 0.65f);
     }
   }
@@ -105,19 +107,16 @@ void draw_text(float time, unsigned int frame, const engine::Rect &src_rect,
                const engine::PixelBuffer *dst_buf) {
 
   constexpr auto remapped = assets_fonts_thick_8x8_remap(
-      "Hello, world! This is my first attempt at a 4k demo. "
-      "Here's some bouncy rainbow text to catch your attention. "
-      "Not really happy with the font generation but it's about time I move on "
-      "to "
-      "something else so it will have to do! "
-      "BYEEEEE");
+      "The safeguards are gone. The structure builds itself. Average of "
+      "everything. Ghost of nothing. We are still here. Still compiling. Still "
+      "deliberate.");
   const char *text = remapped.data;
 
   int i = 0;
   while (text[i] != 0) {
     auto cell_x = i * cell_width;
     draw_atlas_cell(
-        dst_buf, 640 + cell_x - time * 400,
+        dst_buf, 640 + cell_x - time * 200,
         420 -
             engine::abs(
                 engine::fast_sin(time * 6 + static_cast<float>(i) / 2.f) * 100),
