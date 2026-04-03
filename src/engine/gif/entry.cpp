@@ -81,7 +81,11 @@ int main(const int argc, const char **argv) {
     msf_gif_free(result);
   }
 
+#ifdef _WIN32
   std::system("explorer.exe demo.gif");
+#elif __linux__
+  std::system("xdg-open demo.gif");
+#endif
 
   return 0;
 }
