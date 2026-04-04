@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <print>
+#include <ranges>
 #include <sstream>
 #include <vector>
 
@@ -82,8 +83,9 @@ void FontEmbedder::parse_font(const fs::path &path, pugi::xml_node &root,
 		const char id = static_cast<char>(std::stoi(id_attr.value()));
 
 		auto it = m_required_char.find(id);
-		if (it == m_required_char.end())
+		if (it == m_required_char.end()) {
 			continue;
+		}
 
 		glyphs.push_back(
 				{.id = id,
@@ -117,7 +119,7 @@ void FontEmbedder::parse_font(const fs::path &path, pugi::xml_node &root,
 	std::vector<unsigned char> bit_font_data;
 	std::vector<engine::FontGlyph> final_font_glyphs(glyphs.size());
 
-	for (int i = 0; i < glyphs.size(); ++i) {
+	for (size_t i = 0; i < glyphs.size(); ++i) {
 		const auto &glyph = glyphs[i];
 
 		auto &[bitmap] = final_font_glyphs[i];
@@ -170,11 +172,13 @@ void FontEmbedder::parse_font(const fs::path &path, pugi::xml_node &root,
 
 	generated_code << "constexpr engine::FontGlyph " << glyphs_variable
 								 << "[] = {" << std::endl;
-	for (const auto &glyph : final_font_glyphs) {
+
+	for (const auto &[index, glyph] : std::views::enumerate(final_font_glyphs)) {
 		generated_code << "\t{";
 		for (const unsigned char &c : glyph.bitmap)
 			generated_code << static_cast<int>(c) << ",";
-		generated_code << "\t}," << std::endl;
+		generated_code << "\t}," << "// " << index << "; " << glyphs[index].id
+									 << std::endl;
 	}
 
 	generated_code << "};" << std::endl
@@ -184,7 +188,8 @@ void FontEmbedder::parse_font(const fs::path &path, pugi::xml_node &root,
 								 << "\t.glyphs = " << glyphs_variable << "," << std::endl
 								 << "\t.width = " << static_cast<int>(font.width) << ","
 								 << std::endl
-								 << "\t.length = " << static_cast<int>(font.length) << std::endl
+								 << "\t.length = " << static_cast<int>(font.length) + 1
+								 << std::endl
 								 << "};" << std::endl;
 
 	generated_code << "template<unsigned int N>" << std::endl
