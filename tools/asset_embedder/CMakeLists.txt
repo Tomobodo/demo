@@ -6,8 +6,10 @@ target_sources(
         ${TARGET} PRIVATE
         main.cpp
         stb.cpp
+        asset_embedder.cpp
         font.cpp
         palette.cpp
+        string.cpp
         ${ROOT_SOURCE_DIR}/src/engine/font.cpp
 )
 

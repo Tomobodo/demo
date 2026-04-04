@@ -1,0 +1,8 @@
+[hello_world]
+text = """Hello, world! This is my first attempt at a 4k demo. \
+  Here's some bouncy rainbow text to catch your attention. \
+  Not really happy with the font generation but it's about time I move on \
+  to something else so it will have to do! \
+  BYEEEEE\
+"""
+converter = "thick_8x8"

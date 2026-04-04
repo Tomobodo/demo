@@ -103,16 +103,7 @@ void generate_atlas() {
 
 void draw_text(float time, unsigned int frame, const engine::Rect &src_rect,
                const engine::PixelBuffer *dst_buf) {
-
-  constexpr auto remapped = assets_fonts_thick_8x8_remap(
-      "Hello, world! This is my first attempt at a 4k demo. "
-      "Here's some bouncy rainbow text to catch your attention. "
-      "Not really happy with the font generation but it's about time I move on "
-      "to "
-      "something else so it will have to do! "
-      "BYEEEEE");
-  const char *text = remapped.data;
-
+  const auto text = assets_string_hello_world.data;
   int i = 0;
   while (text[i] != 0) {
     auto cell_x = i * cell_width;
