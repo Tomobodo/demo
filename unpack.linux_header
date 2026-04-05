@@ -1,0 +1,1 @@
+a=/tmp/I;tail -n+2 $0|unxz>$a;chmod +x $a;aoss $a;rm $a;exit
