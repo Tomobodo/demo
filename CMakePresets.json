@@ -87,6 +87,14 @@
       }
     },
     {
+      "name": "Release_linux_smol",
+      "inherits": "Release_linux",
+      "binaryDir": "${sourceDir}/build/linux/Release_Compressed",
+      "cacheVariables": {
+        "USE_SMOL": "ON"
+      }
+    },
+    {
       "name": "Release_wasm32",
       "inherits": "base-wasm32",
       "binaryDir": "${sourceDir}/build/wasm32/Release",
@@ -145,6 +153,11 @@
     {
       "name": "Release_linux",
       "configurePreset": "Release_linux",
+      "configuration": "Release"
+    },
+    {
+      "name": "Release_linux_smol",
+      "configurePreset": "Release_linux_smol",
       "configuration": "Release"
     },
     {

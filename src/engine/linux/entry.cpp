@@ -14,7 +14,7 @@ long get_time_ns() {
   return ts.tv_sec * 1000000000L + ts.tv_nsec;
 }
 
-__attribute__((force_align_arg_pointer)) extern "C" void entry() {
+__attribute__((section(".text.startup._start"), force_align_arg_pointer)) extern "C" void _start() {
   Display *dpy = XOpenDisplay(nullptr);
   Window win = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0,
                                    BUFFER_WIDTH, BUFFER_HEIGHT, 0, 0, 0);

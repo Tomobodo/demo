@@ -8,6 +8,7 @@ endif ()
 
 option(USE_WASM_STRIP "Strip final wasm file" OFF)
 option(USE_CRINKLER "Compress final executable with CRINKLER" OFF)
+option(USE_SMOL "Compress final executable with smol" OFF)
 option(HOTRELOAD "Enable hot reload" OFF)
 option(SHOW_FPS "Enable fps counter" OFF)
 set(

@@ -1,3 +1,9 @@
+if (USE_SMOL AND CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_CXX_LINK_EXECUTABLE
+      "${CMAKE_SOURCE_DIR}/cmake/smol-wrapper.sh -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
+  set(SMOL_EXTRA_COMPILE_OPTIONS -fomit-frame-pointer)
+endif()
+
 add_executable(${PROJECT_NAME})
 
 set_target_properties(
@@ -18,11 +24,13 @@ set(COMPILE_OPTIONS
 target_compile_options(
   ${PROJECT_NAME}_module PRIVATE
   ${COMPILE_OPTIONS}
+  ${SMOL_EXTRA_COMPILE_OPTIONS}
 )
 
 target_compile_options(
   ${PROJECT_NAME} PRIVATE
   ${COMPILE_OPTIONS}
+  ${SMOL_EXTRA_COMPILE_OPTIONS}
 )
 
 target_sources(
@@ -40,7 +48,6 @@ target_sources(
 target_link_options(
   ${PROJECT_NAME} PRIVATE
   -nostdlib
-  -Wl,-e,entry
   $<$<CONFIG:Release>:-Wl,--strip-all>
   $<$<CONFIG:Release>:-Wl,--gc-sections>
   $<$<CONFIG:Release>:-Wl,--discard-all>
@@ -52,9 +59,18 @@ target_link_libraries(
   X11
 )
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-add_custom_command(
-  TARGET ${PROJECT_NAME} POST_BUILD
-  COMMAND sstrip $<TARGET_FILE:${PROJECT_NAME}>
-)
+if (CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT USE_SMOL)
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND sstrip $<TARGET_FILE:${PROJECT_NAME}>
+  )
+endif()
+
+if (USE_SMOL AND CMAKE_BUILD_TYPE STREQUAL "Release")
+  add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND python3 $ENV{HOME}/tools/smol/smoltrunc.py $<TARGET_FILE:${PROJECT_NAME}> $<TARGET_FILE:${PROJECT_NAME}>.trunc
+    COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${PROJECT_NAME}>.trunc $<TARGET_FILE:${PROJECT_NAME}>
+    COMMAND chmod +x $<TARGET_FILE:${PROJECT_NAME}>
+  )
 endif()
